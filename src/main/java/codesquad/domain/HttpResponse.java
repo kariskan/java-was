@@ -10,4 +10,8 @@ public record HttpResponse(
 	public String toString() {
 		return statusLine.toString() + header.toString() + body;
 	}
+
+	public byte[] getBytes() {
+		return toString().getBytes();
+	}
 }
