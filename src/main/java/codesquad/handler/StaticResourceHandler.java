@@ -1,8 +1,10 @@
 package codesquad.handler;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import codesquad.domain.HttpHeader;
@@ -26,10 +28,14 @@ public class StaticResourceHandler implements Handler {
 			if (resource == null) {
 				throw new IllegalArgumentException("Resource not found: " + httpRequest.requestLine());
 			}
-			BufferedInputStream inputStream = new BufferedInputStream(resource.openStream());
-			return new HttpResponse(StatusLine.ok(), new HttpHeader(Map.of()), new String(inputStream.readAllBytes()));
+			Path path = Path.of(resource.toURI());
+			byte[] bytes = Files.readAllBytes(path);
+			String contentType = Files.probeContentType(path);
+			return new HttpResponse(StatusLine.ok(), new HttpHeader(Map.of("Content-Type", contentType)), new String(bytes));
 		} catch (IOException e) {
 			throw new IllegalArgumentException("Could not load resource", e);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException("Could not parse resource", e);
 		}
 	}
 }
