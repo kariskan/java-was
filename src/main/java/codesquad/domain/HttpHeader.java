@@ -21,6 +21,6 @@ public record HttpHeader(
 	public String toString() {
 		return headers.entrySet().stream()
 				   .map(e -> e.getKey() + ": " + e.getValue())
-				   .collect(Collectors.joining(lineSeparator())) + lineSeparator();
+				   .collect(Collectors.joining(lineSeparator())) + lineSeparator() + lineSeparator();
 	}
 }
