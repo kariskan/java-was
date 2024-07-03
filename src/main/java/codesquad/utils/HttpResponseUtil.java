@@ -11,7 +11,9 @@ public class HttpResponseUtil {
 	}
 
 	public static void writeResponse(OutputStream bo, HttpResponse httpResponse) throws IOException {
-		bo.write(httpResponse.getBytes());
+		bo.write(httpResponse.statusLine().toString().getBytes());
+		bo.write(httpResponse.header().toString().getBytes());
+		bo.write(httpResponse.body());
 		bo.flush();
 	}
 }
