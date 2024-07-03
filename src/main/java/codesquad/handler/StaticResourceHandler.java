@@ -1,20 +1,24 @@
 package codesquad.handler;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import codesquad.domain.ContentType;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.StatusLine;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.HashMap;
 
 public class StaticResourceHandler implements Handler {
 
 	public static final String STATIC_PATH = "static";
 	private final HttpRequest httpRequest;
+	private final Logger log = LoggerFactory.getLogger(StaticResourceHandler.class);
 
 	public StaticResourceHandler(HttpRequest httpRequest) {
 		this.httpRequest = httpRequest;
@@ -24,19 +28,24 @@ public class StaticResourceHandler implements Handler {
 	public HttpResponse doService() {
 		try {
 			URL resource = getClass().getClassLoader().getResource(STATIC_PATH + httpRequest.requestLine().url());
-//			 TODO http fail response
 			if (resource == null) {
 				throw new IllegalArgumentException("Resource not found: " + httpRequest.requestLine());
 			}
-			HashMap<String, String> headers = new HashMap<>();
 			File file = new File(resource.getFile());
 			byte[] bytes = Files.readAllBytes(file.toPath());
 
-			headers.put("Content-Length", String.valueOf(file.length()));
-			headers.put("Content-Type", ContentType.from(httpRequest.getExtension()).getMimeType());
-			return new HttpResponse(StatusLine.ok(), new HttpHeader(headers), bytes);
+			HttpHeader httpHeader = makeHttpHeader(file);
+			return new HttpResponse(StatusLine.ok(), httpHeader, bytes);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Could not load resource", e);
+			log.error("io exception", e);
+			return null;
 		}
+	}
+
+	private HttpHeader makeHttpHeader(File file) {
+		HttpHeader httpHeader = HttpHeader.of();
+		httpHeader.setHeaderValue("Content-Length", String.valueOf(file.length()));
+		httpHeader.setHeaderValue("Content-Type", ContentType.from(httpRequest.getExtension()).getMimeType());
+		return httpHeader;
 	}
 }
