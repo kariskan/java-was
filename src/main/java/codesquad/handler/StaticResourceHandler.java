@@ -1,9 +1,10 @@
 package codesquad.handler;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class StaticResourceHandler implements Handler {
 				throw new IllegalArgumentException("Resource not found: " + httpRequest.requestLine());
 			}
 			File file = new File(resource.getFile());
-			byte[] bytes = Files.readAllBytes(file.toPath());
+			byte[] bytes = readBytesFromFile(file);
 
 			HttpHeader httpHeader = makeHttpHeader(file);
 			return new HttpResponse(StatusLine.ok(), httpHeader, bytes);
@@ -47,5 +48,11 @@ public class StaticResourceHandler implements Handler {
 		httpHeader.setHeaderValue("Content-Length", String.valueOf(file.length()));
 		httpHeader.setHeaderValue("Content-Type", ContentType.from(httpRequest.getExtension()).getMimeType());
 		return httpHeader;
+	}
+
+	private byte[] readBytesFromFile(File file) throws IOException {
+		try (InputStream inputStream = new FileInputStream(file)) {
+			return inputStream.readAllBytes();
+		}
 	}
 }
