@@ -1,9 +1,8 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,10 +13,10 @@ public class HttpResponseTest {
 	void testToString() throws Exception {
 		StatusLine statusLine = new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK);
 		HttpHeader header = new HttpHeader(Map.of("Content-Type", "text/html"));
-		String body = "<html><body>Hello World</body></html>";
+		byte[] body = "<html><body>Hello World</body></html>".getBytes();
 
 		HttpResponse httpResponse = new HttpResponse(statusLine, header, body);
-		String expected = statusLine.toString() + header.toString() + body;
+		String expected = statusLine + header.toString() + new String(body);
 
 		assertThat(httpResponse.toString()).isEqualTo(expected);
 	}
@@ -27,7 +26,7 @@ public class HttpResponseTest {
 	void testGetBytes() throws Exception {
 		StatusLine statusLine = new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK);
 		HttpHeader header = new HttpHeader(Map.of("Content-Type", "text/html"));
-		String body = "<html><body>Hello World</body></html>";
+		byte[] body = "<html><body>Hello World</body></html>".getBytes();
 
 		HttpResponse httpResponse = new HttpResponse(statusLine, header, body);
 		byte[] expected = httpResponse.toString().getBytes();

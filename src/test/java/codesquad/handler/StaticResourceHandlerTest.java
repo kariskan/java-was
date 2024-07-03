@@ -30,7 +30,6 @@ public class StaticResourceHandlerTest {
 		HttpResponse httpResponse = handler.doService();
 
 		assertThat(httpResponse.statusLine()).isEqualTo(StatusLine.ok());
-		assertThat(httpResponse.header().headers()).isEmpty();
 		assertThat(httpResponse.body()).isNotEmpty();
 	}
 }

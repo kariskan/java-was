@@ -42,7 +42,7 @@ public class HttpHeaderTest {
 		HttpHeader httpHeader = new HttpHeader(headersMap);
 
 		String expected = "Accept: application/xml" + lineSeparator()
-						  + "Content-Type: application/json" + lineSeparator();
+						  + "Content-Type: application/json" + lineSeparator() + lineSeparator();
 		assertThat(httpHeader.toString()).isEqualTo(expected);
 	}
 }
