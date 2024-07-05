@@ -10,10 +10,10 @@ public class HttpResponseUtil {
 	private HttpResponseUtil() {
 	}
 
-	public static void writeResponse(OutputStream bo, HttpResponse httpResponse) throws IOException {
-		bo.write(httpResponse.statusLine().toString().getBytes());
-		bo.write(httpResponse.header().toString().getBytes());
-		bo.write(httpResponse.body());
+	public static void writeResponse(OutputStream bo, HttpResponse response) throws IOException {
+		bo.write(response.getStatusLine().toString().getBytes());
+		bo.write(response.getHeader().toString().getBytes());
+		bo.write(response.getBody());
 		bo.flush();
 	}
 }
