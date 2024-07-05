@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="../reset.css" rel="stylesheet" />
-    <link href="../global.css" rel="stylesheet" />
+    <link href="reset.css" rel="stylesheet" />
+    <link href="global.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
       <header class="header">
-        <a href="/"><img src="../img/signiture.svg" /></a>
+        <a href="/static"><img src="img/signiture.svg" /></a>
         <ul class="header__menu">
           <li class="header__menu__item">
             <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
           </li>
           <li class="header__menu__item">
-            <a class="btn btn_ghost btn_size_s" href="/registration">
+            <a class="btn btn_ghost btn_size_s" href="/register.html">
               회원 가입
             </a>
           </li>
@@ -28,6 +28,7 @@
             <p class="title_textfield">아이디</p>
             <input
               class="input_textfield"
+              id="userId"
               placeholder="아이디를 입력해주세요"
               autocomplete="username"
             />
@@ -36,6 +37,7 @@
             <p class="title_textfield">닉네임</p>
             <input
               class="input_textfield"
+              id="nickname"
               placeholder="닉네임을 입력해주세요"
               autocomplete="username"
             />
@@ -44,6 +46,7 @@
             <p class="title_textfield">비밀번호</p>
             <input
               class="input_textfield"
+              id="password"
               type="password"
               placeholder="비밀번호를 입력해주세요"
               autocomplete="current-password"
@@ -60,5 +63,22 @@
         </form>
       </div>
     </div>
+    <script>
+      document.getElementById('registration-btn').addEventListener('click', function() {
+        const userId = document.getElementById('userId').value;
+        const nickname = document.getElementById('nickname').value;
+        const password = document.getElementById('password').value;
+
+        const url = `/create?userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}&nickname=${encodeURIComponent(nickname)}&email=${encodeURIComponent(userId + '@slipp.net')}`;
+
+        fetch(url, {
+          method: 'GET'
+        })
+                .then(response => response.json())
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+      });
+    </script>
   </body>
 </html>
