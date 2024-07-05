@@ -1,48 +1,57 @@
 package codesquad.domain;
 
-import static codesquad.utils.StringUtils.*;
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import codesquad.utils.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
+import static org.assertj.core.api.Assertions.*;
+
 public class HttpHeaderTest {
 
-	@Test
-	@DisplayName("headers에 headerName이 존재하는지 확인")
-	void testExistsHeaderValue() throws Exception {
-		Map<String, String> headersMap = new HashMap<>();
-		headersMap.put("Content-Type", "application/json");
-		HttpHeader httpHeader = new HttpHeader(headersMap);
+	private HttpHeader httpHeader;
 
-		assertThat(httpHeader.existsHeaderValue("Content-Type")).isTrue();
-		assertThat(httpHeader.existsHeaderValue("Accept")).isFalse();
+	@BeforeEach
+	void setUp() {
+		httpHeader = new HttpHeader(new HashMap<>());
 	}
 
 	@Test
-	@DisplayName("headers에서 headerName에 해당하는 값을 반환")
-	void testGetHeaderValue() throws Exception {
-		Map<String, String> headersMap = new HashMap<>();
-		headersMap.put("Content-Type", "application/json");
-		HttpHeader httpHeader = new HttpHeader(headersMap);
+	@DisplayName("기본 헤더가 설정된다")
+	void setDefaultHeaders() {
+		httpHeader.setDefaultHeaders();
+		assertThat(httpHeader.existsHeaderValue("Date")).isTrue();
+	}
 
+	@Test
+	@DisplayName("헤더 값을 설정한다")
+	void setHeaderValue() {
+		httpHeader.setHeaderValue("Content-Type", "application/json");
 		assertThat(httpHeader.getHeaderValue("Content-Type")).isEqualTo("application/json");
-		assertThat(httpHeader.getHeaderValue("Accept")).isNull();
 	}
 
 	@Test
-	@DisplayName("headers를 올바르게 문자열로 변환")
-	void testToString() throws Exception {
-		Map<String, String> headersMap = new HashMap<>();
-		headersMap.put("Content-Type", "application/json");
-		headersMap.put("Accept", "application/xml");
-		HttpHeader httpHeader = new HttpHeader(headersMap);
+	@DisplayName("헤더 값을 조회한다")
+	void getHeaderValue() {
+		httpHeader.setHeaderValue("Content-Type", "application/json");
+		assertThat(httpHeader.getHeaderValue("Content-Type")).isEqualTo("application/json");
+	}
 
-		String expected = "Accept: application/xml" + lineSeparator()
-						  + "Content-Type: application/json" + lineSeparator() + lineSeparator();
+	@Test
+	@DisplayName("헤더 값이 존재하는지 확인한다")
+	void existsHeaderValue() {
+		httpHeader.setHeaderValue("Content-Type", "application/json");
+		assertThat(httpHeader.existsHeaderValue("Content-Type")).isTrue();
+		assertThat(httpHeader.existsHeaderValue("Authorization")).isFalse();
+	}
+
+	@Test
+	@DisplayName("헤더를 문자열로 변환한다")
+	void testToString() {
+		httpHeader.setHeaderValue("Content-Type", "application/json");
+		String expected = "Content-Type: application/json" + StringUtils.lineSeparator() + StringUtils.lineSeparator();
 		assertThat(httpHeader.toString()).isEqualTo(expected);
 	}
 }

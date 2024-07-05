@@ -1,50 +1,59 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.*;
+
 public class HttpRequestTest {
 
-	@Test
-	@DisplayName("HttpRequest 생성 및 RequestLine 반환 확인")
-	void testGetRequestLine() throws Exception {
-		RequestLine requestLine = new RequestLine(HttpMethod.GET, "/index.html", HttpProtocol.HTTP11);
-		HttpHeader header = new HttpHeader(new HashMap<>());
+	private HttpRequest httpRequest;
+
+	@BeforeEach
+	void setUp() {
+		RequestLine requestLine = new RequestLine(HttpMethod.GET, new Path("/index.html"), HttpProtocol.HTTP11);
+		HttpHeader header = HttpHeader.of();
 		String body = "";
-
-		HttpRequest httpRequest = new HttpRequest(requestLine, header, body);
-
-		assertThat(httpRequest.requestLine()).isEqualTo(requestLine);
+		httpRequest = new HttpRequest(requestLine, header, body);
 	}
 
 	@Test
-	@DisplayName("HttpRequest 생성 및 HttpHeader 반환 확인")
-	void testGetHeader() throws Exception {
-		RequestLine requestLine = new RequestLine(HttpMethod.GET, "/index.html", HttpProtocol.HTTP11);
-		Map<String, String> headersMap = new HashMap<>();
-		headersMap.put("Host", "www.example.com");
-		HttpHeader header = new HttpHeader(headersMap);
-		String body = "";
-
-		HttpRequest httpRequest = new HttpRequest(requestLine, header, body);
-
-		assertThat(httpRequest.header()).isEqualTo(header);
+	@DisplayName("확장자를 반환한다")
+	void getExtension() {
+		assertThat(httpRequest.getExtension()).isEqualTo(".html");
 	}
 
 	@Test
-	@DisplayName("HttpRequest 생성 및 Body 반환 확인")
-	void testGetBody() throws Exception {
-		RequestLine requestLine = new RequestLine(HttpMethod.POST, "/submit", HttpProtocol.HTTP11);
-		HttpHeader header = new HttpHeader(new HashMap<>());
-		String body = "name=John&age=30";
+	@DisplayName("GET 요청인지 확인한다")
+	void isGet() {
+		assertThat(httpRequest.isGet()).isTrue();
+		assertThat(httpRequest.isPost()).isFalse();
+	}
 
-		HttpRequest httpRequest = new HttpRequest(requestLine, header, body);
+	@Test
+	@DisplayName("POST 요청인지 확인한다")
+	void isPost() {
+		RequestLine postRequestLine = new RequestLine(HttpMethod.POST, new Path("/submit"), HttpProtocol.HTTP11);
+		HttpRequest postRequest = new HttpRequest(postRequestLine, httpRequest.header(), "");
+		assertThat(postRequest.isPost()).isTrue();
+		assertThat(postRequest.isGet()).isFalse();
+	}
 
-		assertThat(httpRequest.body()).isEqualTo(body);
+	@Test
+	@DisplayName("정적 요청인지 확인한다")
+	void isStaticRequest() {
+		RequestLine staticRequestLine = new RequestLine(HttpMethod.GET, new Path("/image.png"), HttpProtocol.HTTP11);
+		HttpRequest staticRequest = new HttpRequest(staticRequestLine, httpRequest.header(), "");
+		assertThat(staticRequest.isStaticRequest()).isTrue();
+	}
+
+	@Test
+	@DisplayName("파라미터를 반환한다")
+	void getParameters() {
+		RequestLine parameterRequestLine = new RequestLine(HttpMethod.GET, new Path("/search?query=test"), HttpProtocol.HTTP11);
+		HttpRequest parameterRequest = new HttpRequest(parameterRequestLine, httpRequest.header(), "");
+		assertThat(parameterRequest.getParameters()).isNotNull();
+		assertThat(parameterRequest.getParameters().getValueByKey("query")).isEqualTo("test");
 	}
 }

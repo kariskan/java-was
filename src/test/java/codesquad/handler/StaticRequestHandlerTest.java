@@ -1,8 +1,7 @@
-//package codesquad.handler.mapping;
+//package codesquad.handler;
 //
 //import static org.assertj.core.api.Assertions.*;
 //
-//import codesquad.handler.HandlerMapping;
 //import java.util.HashMap;
 //
 //import org.junit.jupiter.api.DisplayName;
@@ -12,22 +11,25 @@
 //import codesquad.domain.HttpMethod;
 //import codesquad.domain.HttpProtocol;
 //import codesquad.domain.HttpRequest;
+//import codesquad.domain.HttpResponse;
 //import codesquad.domain.RequestLine;
-//import codesquad.handler.Handler;
-//import codesquad.handler.StaticRequestHandler;
+//import codesquad.domain.StatusLine;
 //
-//public class HandlerMappingTest {
+//public class StaticRequestHandlerTest {
 //
 //	@Test
-//	@DisplayName("HttpRequest에 대한 Handler 반환 확인")
-//	void testGetHandler() throws Exception {
+//	@DisplayName("정적 자원에 대한 HttpResponse 반환 확인")
+//	void testDoService() throws Exception {
 //		RequestLine requestLine = new RequestLine(HttpMethod.GET, "/index.html", HttpProtocol.HTTP11);
 //		HttpHeader header = new HttpHeader(new HashMap<>());
 //		String body = "";
 //
 //		HttpRequest httpRequest = new HttpRequest(requestLine, header, body);
-//		Handler handler = HandlerMapping.getHandler(httpRequest);
+//		StaticRequestHandler handler = new StaticRequestHandler(httpRequest);
 //
-//		assertThat(handler).isInstanceOf(StaticRequestHandler.class);
+//		HttpResponse httpResponse = handler.doService();
+//
+//		assertThat(httpResponse.statusLine()).isEqualTo(StatusLine.ok());
+//		assertThat(httpResponse.body()).isNotEmpty();
 //	}
 //}
