@@ -1,12 +1,6 @@
 package codesquad.handler;
 
-import codesquad.domain.HttpMethod;
-import codesquad.domain.HttpProtocol;
 import codesquad.domain.HttpRequest;
-import codesquad.domain.Path;
-import codesquad.domain.RequestLine;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class HandlerMapping {
 

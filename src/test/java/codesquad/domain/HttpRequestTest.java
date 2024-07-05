@@ -1,10 +1,10 @@
 package codesquad.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 public class HttpRequestTest {
 
@@ -51,7 +51,8 @@ public class HttpRequestTest {
 	@Test
 	@DisplayName("파라미터를 반환한다")
 	void getParameters() {
-		RequestLine parameterRequestLine = new RequestLine(HttpMethod.GET, new Path("/search?query=test"), HttpProtocol.HTTP11);
+		RequestLine parameterRequestLine = new RequestLine(HttpMethod.GET, new Path("/search?query=test"),
+			HttpProtocol.HTTP11);
 		HttpRequest parameterRequest = new HttpRequest(parameterRequestLine, httpRequest.header(), "");
 		assertThat(parameterRequest.getParameters()).isNotNull();
 		assertThat(parameterRequest.getParameters().getValueByKey("query")).isEqualTo("test");

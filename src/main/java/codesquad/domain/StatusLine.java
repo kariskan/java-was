@@ -1,6 +1,6 @@
 package codesquad.domain;
 
-import static codesquad.utils.StringUtils.*;
+import static codesquad.utils.StringUtils.lineSeparator;
 
 public record StatusLine(
 	HttpProtocol protocol,

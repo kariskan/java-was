@@ -1,15 +1,13 @@
 package codesquad;
 
+import codesquad.http.WASRunner;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import codesquad.http.WASRunner;
 
 public class Main {
 

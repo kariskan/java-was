@@ -15,7 +15,9 @@ public abstract class DynamicHandler implements Handler {
 		}
 	}
 
-	public void doPost(HttpRequest request, HttpResponse response) {}
+	public void doPost(HttpRequest request, HttpResponse response) {
+	}
 
-	public void doGet(HttpRequest request, HttpResponse response) {}
+	public void doGet(HttpRequest request, HttpResponse response) {
+	}
 }

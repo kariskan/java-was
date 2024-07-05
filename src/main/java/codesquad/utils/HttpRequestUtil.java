@@ -6,7 +6,6 @@ import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpProtocol;
 import codesquad.domain.HttpRequest;
-import codesquad.domain.Parameters;
 import codesquad.domain.Path;
 import codesquad.domain.RequestLine;
 import java.io.IOException;
