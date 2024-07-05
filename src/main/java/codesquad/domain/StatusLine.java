@@ -12,6 +12,6 @@ public record StatusLine(
 
 	@Override
 	public String toString() {
-		return protocol.getProtocol() + " " + status.getCode() + " " + status.name() + lineSeparator();
+		return protocol.getProtocol() + " " + status.getCode() + " " + status.getValue() + lineSeparator();
 	}
 }
