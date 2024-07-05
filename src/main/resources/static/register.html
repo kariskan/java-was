@@ -69,15 +69,7 @@
         const nickname = document.getElementById('nickname').value;
         const password = document.getElementById('password').value;
 
-        const url = `/create?userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}&nickname=${encodeURIComponent(nickname)}&email=${encodeURIComponent(userId + '@slipp.net')}`;
-
-        fetch(url, {
-          method: 'GET'
-        })
-                .then(response => response.json())
-                .catch(error => {
-                  console.error('Error:', error);
-                });
+        window.location.href = `/create?userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}&nickname=${encodeURIComponent(nickname)}&email=${encodeURIComponent(userId + '@slipp.net')}`;
       });
     </script>
   </body>
