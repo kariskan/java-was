@@ -4,8 +4,6 @@ import codesquad.domain.ContentType;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -55,8 +53,7 @@ public class StaticRequestHandler implements Handler {
 		if (resource == null) {
 			throw new IllegalArgumentException("Resource not found: " + request.requestLine());
 		}
-		File file = new File(resource.getFile());
-		try (InputStream inputStream = new FileInputStream(file)) {
+		try (InputStream inputStream = resource.openStream()) {
 			return inputStream.readAllBytes();
 		}
 	}
