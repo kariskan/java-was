@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
-import codesquad.handler.mapping.HandlerMapping;
+import codesquad.handler.HandlerMapping;
 import codesquad.utils.HttpRequestUtil;
 import codesquad.utils.HttpResponseUtil;
 
@@ -29,11 +29,10 @@ public class WASRunner implements Runnable {
 			var bi = new BufferedInputStream(socket.getInputStream());
 			var bo = new BufferedOutputStream(socket.getOutputStream())
 		) {
-			HttpRequest httpRequest = HttpRequestUtil.parseRequest(bi);
-			log.debug("{}", httpRequest);
-
-			HttpResponse httpResponse = HandlerMapping.getHandler(httpRequest).doService();
-			HttpResponseUtil.writeResponse(bo, httpResponse);
+			HttpRequest request = HttpRequestUtil.parseRequest(bi);
+			HttpResponse response = new HttpResponse();
+			HandlerMapping.getHandler(request).doService(request, response);
+			HttpResponseUtil.writeResponse(bo, response);
 			socket.close();
 		} catch (IOException | IllegalArgumentException e) {
 			log.error("io exception", e);
