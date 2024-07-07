@@ -1,6 +1,6 @@
 package codesquad.domain;
 
-import static codesquad.utils.StringUtils.lineSeparator;
+import static codesquad.utils.StringUtils.*;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -46,7 +46,7 @@ public class HttpHeader {
 	@Override
 	public String toString() {
 		return headers.entrySet().stream()
-			.map(e -> e.getKey() + ": " + e.getValue())
-			.collect(Collectors.joining(lineSeparator())) + lineSeparator() + lineSeparator();
+				   .map(e -> e.getKey() + ": " + e.getValue())
+				   .collect(Collectors.joining(lineSeparator())) + lineSeparator() + lineSeparator();
 	}
 }

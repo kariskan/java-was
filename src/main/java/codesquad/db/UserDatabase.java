@@ -1,9 +1,10 @@
 package codesquad.db;
 
-import codesquad.domain.User;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import codesquad.domain.User;
 
 public class UserDatabase implements Database<User> {
 

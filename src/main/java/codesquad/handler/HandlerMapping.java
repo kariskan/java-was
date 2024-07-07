@@ -8,10 +8,10 @@ public class HandlerMapping {
 
 	public static final String STATIC_PATH = "static";
 
-//	private static final Map<String, Handler> DYNAMIC_HANDLERS = Map.of(
-//		new RequestLine(HttpMethod.GET, new Path("/create"), HttpProtocol.HTTP11), SignUpHandler.getInstance()
-//	);
-//	private static final Handler STATIC_HANDLER = StaticRequestHandler.getInstance();
+	//	private static final Map<String, Handler> DYNAMIC_HANDLERS = Map.of(
+	//		new RequestLine(HttpMethod.GET, new Path("/create"), HttpProtocol.HTTP11), SignUpHandler.getInstance()
+	//	);
+	//	private static final Handler STATIC_HANDLER = StaticRequestHandler.getInstance();
 
 	private HandlerMapping() {
 	}

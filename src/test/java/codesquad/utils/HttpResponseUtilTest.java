@@ -1,6 +1,12 @@
 package codesquad.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Map;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import codesquad.domain.HttpBody;
 import codesquad.domain.HttpHeader;
@@ -8,10 +14,6 @@ import codesquad.domain.HttpProtocol;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
 import codesquad.domain.StatusLine;
-import java.io.ByteArrayOutputStream;
-import java.util.Map;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 public class HttpResponseUtilTest {
 

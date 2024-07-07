@@ -28,27 +28,27 @@ public class HttpResponse {
 		return body.body();
 	}
 
-	public HttpHeader getHeader() {
-		return header;
+	public void setBody(byte[] body) {
+		this.body = new HttpBody(body);
 	}
 
-	public StatusLine getStatusLine() {
-		return statusLine;
+	public HttpHeader getHeader() {
+		return header;
 	}
 
 	public void setHeader(HttpHeader header) {
 		this.header = header;
 	}
 
-	public void setStatusLine() {
-		this.statusLine = new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK);
+	public StatusLine getStatusLine() {
+		return statusLine;
 	}
 
 	public void setStatusLine(HttpStatus httpStatus) {
 		this.statusLine = new StatusLine(HttpProtocol.HTTP11, httpStatus);
 	}
 
-	public void setBody(byte[] body) {
-		this.body = new HttpBody(body);
+	public void setStatusLine() {
+		this.statusLine = new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK);
 	}
 }
