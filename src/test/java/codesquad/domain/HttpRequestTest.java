@@ -1,6 +1,6 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,10 +12,10 @@ public class HttpRequestTest {
 
 	@BeforeEach
 	void setUp() {
-		RequestLine requestLine = new RequestLine(HttpMethod.GET, new Path("/index.html"), HttpProtocol.HTTP11);
+		RequestLine requestLine = new RequestLine(HttpMethod.GET, new Path("/register.html"), HttpProtocol.HTTP11);
 		HttpHeader header = HttpHeader.of();
 		String body = "";
-		httpRequest = new HttpRequest(requestLine, header, body);
+		httpRequest = new HttpRequest(requestLine, header, new HttpBody(body.getBytes()));
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class HttpRequestTest {
 	@DisplayName("POST 요청인지 확인한다")
 	void isPost() {
 		RequestLine postRequestLine = new RequestLine(HttpMethod.POST, new Path("/submit"), HttpProtocol.HTTP11);
-		HttpRequest postRequest = new HttpRequest(postRequestLine, httpRequest.header(), "");
+		HttpRequest postRequest = new HttpRequest(postRequestLine, httpRequest.header(), new HttpBody("".getBytes()));
 		assertThat(postRequest.isPost()).isTrue();
 		assertThat(postRequest.isGet()).isFalse();
 	}
@@ -44,7 +44,8 @@ public class HttpRequestTest {
 	@DisplayName("정적 요청인지 확인한다")
 	void isStaticRequest() {
 		RequestLine staticRequestLine = new RequestLine(HttpMethod.GET, new Path("/image.png"), HttpProtocol.HTTP11);
-		HttpRequest staticRequest = new HttpRequest(staticRequestLine, httpRequest.header(), "");
+		HttpRequest staticRequest = new HttpRequest(staticRequestLine, httpRequest.header(),
+			new HttpBody("".getBytes()));
 		assertThat(staticRequest.isStaticRequest()).isTrue();
 	}
 
@@ -53,7 +54,8 @@ public class HttpRequestTest {
 	void getParameters() {
 		RequestLine parameterRequestLine = new RequestLine(HttpMethod.GET, new Path("/search?query=test"),
 			HttpProtocol.HTTP11);
-		HttpRequest parameterRequest = new HttpRequest(parameterRequestLine, httpRequest.header(), "");
+		HttpRequest parameterRequest = new HttpRequest(parameterRequestLine, httpRequest.header(),
+			new HttpBody("".getBytes()));
 		assertThat(parameterRequest.getParameters()).isNotNull();
 		assertThat(parameterRequest.getParameters().getValueByKey("query")).isEqualTo("test");
 	}

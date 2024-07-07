@@ -1,52 +1,50 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class HttpResponseTest {
-
-	private HttpResponse httpResponse;
-
-	@BeforeEach
-	void setUp() {
-		httpResponse = new HttpResponse();
-	}
+class HttpResponseTest {
 
 	@Test
-	@DisplayName("상태 라인을 설정한다")
+	@DisplayName("상태 라인 설정")
 	void setStatusLine() {
+		HttpResponse httpResponse = new HttpResponse();
 		httpResponse.setStatusLine(HttpStatus.OK);
+
 		assertThat(httpResponse.getStatusLine().status()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
-	@DisplayName("헤더를 설정한다")
-	void setHeader() {
-		HttpHeader header = HttpHeader.of();
-		httpResponse.setHeader(header);
-		assertThat(httpResponse.getHeader()).isEqualTo(header);
-	}
-
-	@Test
-	@DisplayName("본문을 설정한다")
-	void setBody() {
-		byte[] body = "Hello, World!".getBytes();
+	@DisplayName("본문 설정 및 조회")
+	void setAndGetBody() {
+		HttpResponse httpResponse = new HttpResponse();
+		byte[] body = "Hello, world!".getBytes();
 		httpResponse.setBody(body);
+
 		assertThat(httpResponse.getBody()).isEqualTo(body);
 	}
 
 	@Test
-	@DisplayName("HTTP 응답을 문자열로 변환한다")
-	void testToString() {
-		httpResponse.setStatusLine(HttpStatus.OK);
-		HttpHeader header = HttpHeader.of();
-		httpResponse.setHeader(header);
-		String body = "Hello, World!";
-		httpResponse.setBody(body.getBytes());
-		String expected = httpResponse.getStatusLine().toString() + header.toString() + body;
-		assertThat(httpResponse.toString()).isEqualTo(expected);
+	@DisplayName("헤더 설정 및 조회")
+	void setAndGetHeader() {
+		HttpHeader httpHeader = HttpHeader.of();
+		HttpResponse httpResponse = new HttpResponse();
+		httpResponse.setHeader(httpHeader);
+
+		assertThat(httpResponse.getHeader()).isEqualTo(httpHeader);
+	}
+
+	@Test
+	@DisplayName("응답 문자열 변환")
+	void convertToString() {
+		HttpHeader httpHeader = HttpHeader.of();
+		byte[] body = "Hello, world!".getBytes();
+		HttpResponse httpResponse = new HttpResponse(new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK), httpHeader,
+			new HttpBody(body));
+
+		String expectedResponse = httpResponse.getStatusLine().toString() + httpHeader.toString() + new String(body);
+		assertThat(httpResponse.toString()).isEqualTo(expectedResponse);
 	}
 }

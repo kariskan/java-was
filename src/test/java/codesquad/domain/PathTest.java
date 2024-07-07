@@ -18,8 +18,8 @@ public class PathTest {
 	@Test
 	@DisplayName("파라미터가 없는 URL을 생성한다")
 	void createPathWithoutParameters() {
-		Path path = new Path("/index.html");
-		assertThat(path.getUrl()).isEqualTo("/index.html");
+		Path path = new Path("/register.html");
+		assertThat(path.getUrl()).isEqualTo("/register.html");
 		assertThat(path.getParameters()).isNull();
 	}
 }

@@ -2,6 +2,7 @@ package codesquad.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import codesquad.domain.HttpBody;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpProtocol;
 import codesquad.domain.HttpResponse;
@@ -20,7 +21,7 @@ public class HttpResponseUtilTest {
 		StatusLine statusLine = new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK);
 		HttpHeader header = new HttpHeader(Map.of("Content-Type", "text/html"));
 		byte[] body = "<html><body>Hello World</body></html>".getBytes();
-		HttpResponse httpResponse = new HttpResponse(statusLine, header, body);
+		HttpResponse httpResponse = new HttpResponse(statusLine, header, new HttpBody(body));
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HttpResponseUtil.writeResponse(outputStream, httpResponse);
