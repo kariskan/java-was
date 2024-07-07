@@ -4,12 +4,12 @@ public class HttpResponse {
 
 	private StatusLine statusLine;
 	private HttpHeader header;
-	private byte[] body;
+	private HttpBody body;
 
 	public HttpResponse() {
 	}
 
-	public HttpResponse(StatusLine statusLine, HttpHeader header, byte[] body) {
+	public HttpResponse(StatusLine statusLine, HttpHeader header, HttpBody body) {
 		this.statusLine = statusLine;
 		this.header = header;
 		this.body = body;
@@ -17,7 +17,7 @@ public class HttpResponse {
 
 	@Override
 	public String toString() {
-		return statusLine.toString() + header.toString() + new String(body);
+		return statusLine.toString() + header.toString() + new String(body.body());
 	}
 
 	public byte[] getBytes() {
@@ -25,7 +25,7 @@ public class HttpResponse {
 	}
 
 	public byte[] getBody() {
-		return body;
+		return body.body();
 	}
 
 	public HttpHeader getHeader() {
@@ -49,6 +49,6 @@ public class HttpResponse {
 	}
 
 	public void setBody(byte[] body) {
-		this.body = body;
+		this.body = new HttpBody(body);
 	}
 }

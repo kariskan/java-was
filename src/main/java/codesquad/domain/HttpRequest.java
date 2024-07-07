@@ -5,7 +5,7 @@ import java.util.Arrays;
 public record HttpRequest(
 	RequestLine requestLine,
 	HttpHeader header,
-	String body
+	HttpBody body
 ) {
 
 	public String getExtension() {

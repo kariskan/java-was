@@ -2,6 +2,7 @@ package codesquad.utils;
 
 import static codesquad.utils.StringUtils.lineSeparator;
 
+import codesquad.domain.HttpBody;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpProtocol;
@@ -33,12 +34,12 @@ public class HttpRequestUtil {
 
 			RequestLine requestLine = parseRequestLine(split[0]);
 			HttpHeader httpHeader = parseHeader(split);
-			String requestBody = "";
+			HttpBody body = null;
 			if (httpHeader.existsHeaderValue(CONTENT_LENGTH)) {
-				requestBody = parseBody(Integer.parseInt(httpHeader.getHeaderValue(CONTENT_LENGTH)), bi);
+				body = parseBody(Integer.parseInt(httpHeader.getHeaderValue(CONTENT_LENGTH)), bi);
 			}
 
-			HttpRequest request = new HttpRequest(requestLine, httpHeader, requestBody);
+			HttpRequest request = new HttpRequest(requestLine, httpHeader, body);
 			log.debug("{}", request);
 			return request;
 		} catch (IOException e) {
@@ -98,15 +99,10 @@ public class HttpRequestUtil {
 		return new HttpHeader(headers);
 	}
 
-	private static String parseBody(int length, InputStream bi) throws IOException {
+	private static HttpBody parseBody(int length, InputStream bi) throws IOException {
 		if (length > MAX_BODY_SIZE) {
 			throw new IllegalArgumentException("max request bytes exceeded");
 		}
-		byte[] bytes = new byte[length];
-		int idx = 0;
-		while (length-- > 0) {
-			bytes[idx++] = (byte) bi.read();
-		}
-		return new String(bytes, 0, idx);
+		return new HttpBody(bi.readNBytes(length));
 	}
 }
