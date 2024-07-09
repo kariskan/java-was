@@ -1,15 +1,14 @@
 package codesquad.db;
 
-import java.util.HashMap;
+import codesquad.domain.User;
 import java.util.Map;
 import java.util.Optional;
-
-import codesquad.domain.User;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UserDatabase implements Database<User> {
 
 	private static final UserDatabase instance = new UserDatabase();
-	private final Map<String, User> users = new HashMap<>();
+	private final Map<String, User> users = new ConcurrentHashMap<>();
 
 	private UserDatabase() {
 	}
@@ -20,10 +19,12 @@ public class UserDatabase implements Database<User> {
 
 	@Override
 	public void insert(String id, User user) {
-		if (users.containsKey(id)) {
-			throw new IllegalArgumentException("User with id " + id + " already exists");
-		}
-		users.put(id, user);
+		users.compute(id, (s, val) -> {
+			if (val != null) {
+				throw new IllegalArgumentException("User already exists");
+			}
+			return user;
+		});
 	}
 
 	@Override
@@ -34,10 +35,12 @@ public class UserDatabase implements Database<User> {
 
 	@Override
 	public void update(String id, User user) {
-		if (users.containsKey(id)) {
-			users.put(id, user);
-		}
-		throw new IllegalArgumentException("User with id " + id + " does not exist");
+		users.compute(id, (s, val) -> {
+			if (val == null) {
+				throw new IllegalArgumentException("User with id " + id + " does not exist");
+			}
+			return user;
+		});
 	}
 
 	@Override
