@@ -1,8 +1,7 @@
 package codesquad.handler;
 
-import java.net.URL;
-
 import codesquad.domain.HttpRequest;
+import java.net.URL;
 
 public class HandlerMapping {
 

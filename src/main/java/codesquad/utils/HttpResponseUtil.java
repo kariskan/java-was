@@ -1,9 +1,8 @@
 package codesquad.utils;
 
+import codesquad.domain.HttpResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import codesquad.domain.HttpResponse;
 
 public class HttpResponseUtil {
 

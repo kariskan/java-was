@@ -1,16 +1,14 @@
 package codesquad.handler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import codesquad.domain.ContentType;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StaticRequestHandler implements Handler {
 

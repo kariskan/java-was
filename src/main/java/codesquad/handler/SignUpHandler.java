@@ -1,16 +1,13 @@
 package codesquad.handler;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import codesquad.db.UserDatabase;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
-import codesquad.domain.Parameters;
 import codesquad.domain.User;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpHandler extends DynamicHandler {
 
