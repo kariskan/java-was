@@ -24,16 +24,16 @@ public class SignUpHandler extends DynamicHandler {
 	}
 
 	@Override
-	public void doGet(HttpRequest request, HttpResponse response) {
+	public void doPost(HttpRequest request, HttpResponse response) {
 		User user = getUser(request);
 		UserDatabase userDatabase = UserDatabase.getInstance();
-		userDatabase.insert(UUID.randomUUID().toString(), user);
+		userDatabase.insert(user.userId(), user);
 
 		setResponse(response);
 	}
 
 	private void setResponse(HttpResponse response) {
-		response.setStatusLine(HttpStatus.MOVED_PERMANENTLY);
+		response.setStatusLine(HttpStatus.FOUND);
 		HttpHeader header = new HttpHeader(new HashMap<>(Map.of("Location", "/index.html")));
 		header.setDefaultHeaders();
 		header.setHeaderValue("Content-Length", "0");
@@ -41,11 +41,11 @@ public class SignUpHandler extends DynamicHandler {
 	}
 
 	private User getUser(HttpRequest request) {
-		Parameters parameters = request.getParameters();
-		String userId = parameters.getValueByKey("userId");
-		String password = parameters.getValueByKey("password");
-		String email = parameters.getValueByKey("email");
-		String nickname = parameters.getValueByKey("nickname");
+		Map<String, String> params = request.body().bodyToMap();
+		String userId = params.get("userId");
+		String password = params.get("password");
+		String email = params.get("email");
+		String nickname = params.get("nickname");
 
 		return new User(userId, nickname, password, email);
 	}
