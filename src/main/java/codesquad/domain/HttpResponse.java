@@ -1,5 +1,7 @@
 package codesquad.domain;
 
+import java.util.HashMap;
+
 public class HttpResponse {
 
 	private StatusLine statusLine;
@@ -7,12 +9,8 @@ public class HttpResponse {
 	private HttpBody body;
 
 	public HttpResponse() {
-	}
-
-	public HttpResponse(StatusLine statusLine, HttpHeader header, HttpBody body) {
-		this.statusLine = statusLine;
-		this.header = header;
-		this.body = body;
+		header = new HttpHeader(new HashMap<>());
+		header.setDefaultHeaders();
 	}
 
 	@Override
@@ -20,11 +18,10 @@ public class HttpResponse {
 		return statusLine.toString() + header.toString() + new String(body.body());
 	}
 
-	public byte[] getBytes() {
-		return toString().getBytes();
-	}
-
 	public byte[] getBody() {
+		if (body == null) {
+			return null;
+		}
 		return body.body();
 	}
 
@@ -40,6 +37,10 @@ public class HttpResponse {
 		this.header = header;
 	}
 
+	public void addHeader(String name, String value) {
+		header.setHeaderValue(name, value);
+	}
+
 	public StatusLine getStatusLine() {
 		return statusLine;
 	}
@@ -50,5 +51,13 @@ public class HttpResponse {
 
 	public void setStatusLine() {
 		this.statusLine = new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK);
+	}
+
+	public void sendRedirect(String location) {
+		setStatusLine(HttpStatus.FOUND);
+		if (header == null) {
+			header = HttpHeader.of();
+		}
+		header.setHeaderValue("Location", location);
 	}
 }
