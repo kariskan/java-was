@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.error.BaseException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ public class ParametersTest {
 	public void testGetValueByKeyThrowsException() {
 		Parameters parameters = new Parameters("userId=john&password=1234&email=john@example.com");
 		Assertions.assertThatThrownBy(() -> parameters.getValueByKey("nickname"))
-			.isInstanceOf(IllegalArgumentException.class)
+			.isInstanceOf(BaseException.class)
 			.hasMessageContaining("Key nickname not found");
 	}
 

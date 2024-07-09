@@ -1,6 +1,6 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,7 @@ public class HttpRequestTest {
 		RequestLine requestLine = new RequestLine(HttpMethod.GET, new Path("/register.html"), HttpProtocol.HTTP11);
 		HttpHeader header = HttpHeader.of();
 		String body = "";
-		httpRequest = new HttpRequest(requestLine, header, new HttpBody(body.getBytes()));
+		httpRequest = new HttpRequest(requestLine, header, new HttpBody(body.getBytes()), new Cookie[0]);
 	}
 
 	@Test
@@ -35,7 +35,8 @@ public class HttpRequestTest {
 	@DisplayName("POST 요청인지 확인한다")
 	void isPost() {
 		RequestLine postRequestLine = new RequestLine(HttpMethod.POST, new Path("/submit"), HttpProtocol.HTTP11);
-		HttpRequest postRequest = new HttpRequest(postRequestLine, httpRequest.header(), new HttpBody("".getBytes()));
+		HttpRequest postRequest = new HttpRequest(postRequestLine, httpRequest.header(), new HttpBody("".getBytes()),
+			new Cookie[0]);
 		assertThat(postRequest.isPost()).isTrue();
 		assertThat(postRequest.isGet()).isFalse();
 	}
@@ -45,7 +46,7 @@ public class HttpRequestTest {
 	void isStaticRequest() {
 		RequestLine staticRequestLine = new RequestLine(HttpMethod.GET, new Path("/image.png"), HttpProtocol.HTTP11);
 		HttpRequest staticRequest = new HttpRequest(staticRequestLine, httpRequest.header(),
-			new HttpBody("".getBytes()));
+			new HttpBody("".getBytes()), new Cookie[0]);
 		assertThat(staticRequest.isStaticRequest()).isTrue();
 	}
 
@@ -55,7 +56,7 @@ public class HttpRequestTest {
 		RequestLine parameterRequestLine = new RequestLine(HttpMethod.GET, new Path("/search?query=test"),
 			HttpProtocol.HTTP11);
 		HttpRequest parameterRequest = new HttpRequest(parameterRequestLine, httpRequest.header(),
-			new HttpBody("".getBytes()));
+			new HttpBody("".getBytes()), new Cookie[0]);
 		assertThat(parameterRequest.getParameters()).isNotNull();
 		assertThat(parameterRequest.getParameters().getValueByKey("query")).isEqualTo("test");
 	}

@@ -1,9 +1,6 @@
 package codesquad.handler;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
+import codesquad.domain.Cookie;
 import codesquad.domain.HttpBody;
 import codesquad.domain.HttpHeader;
 import codesquad.domain.HttpMethod;
@@ -11,6 +8,10 @@ import codesquad.domain.HttpProtocol;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.Path;
 import codesquad.domain.RequestLine;
+import codesquad.error.BaseException;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class HandlerMappingTest {
 
@@ -19,9 +20,10 @@ public class HandlerMappingTest {
 	public void testGetStaticHandler() {
 		HttpRequest request = new HttpRequest(
 			new RequestLine(HttpMethod.GET,
-				new Path("/index.html"), HttpProtocol.HTTP11),
+				new Path("/user/login.html"), HttpProtocol.HTTP11),
 			new HttpHeader(null),
-			new HttpBody(null));
+			new HttpBody(null),
+			new Cookie[0]);
 		Handler handler = HandlerMapping.getHandler(request);
 		Assertions.assertThat(handler).isInstanceOf(StaticRequestHandler.class);
 	}
@@ -33,7 +35,8 @@ public class HandlerMappingTest {
 			new RequestLine(HttpMethod.POST,
 				new Path("/create"), HttpProtocol.HTTP11),
 			new HttpHeader(null),
-			new HttpBody(null));
+			new HttpBody(null),
+			new Cookie[0]);
 		Handler handler = HandlerMapping.getHandler(request);
 		Assertions.assertThat(handler).isInstanceOf(SignUpHandler.class);
 	}
@@ -45,9 +48,10 @@ public class HandlerMappingTest {
 			new RequestLine(HttpMethod.GET,
 				new Path("/invalid"), HttpProtocol.HTTP11),
 			new HttpHeader(null),
-			new HttpBody(null));
+			new HttpBody(null),
+			new Cookie[0]);
 		Assertions.assertThatThrownBy(() -> HandlerMapping.getHandler(request))
-			.isInstanceOf(IllegalArgumentException.class)
+			.isInstanceOf(BaseException.class)
 			.hasMessageContaining("Invalid request");
 	}
 }

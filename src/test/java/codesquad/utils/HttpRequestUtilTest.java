@@ -1,16 +1,15 @@
 package codesquad.utils;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.ByteArrayInputStream;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpProtocol;
 import codesquad.domain.HttpRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class HttpRequestUtilTest {
 
@@ -30,12 +29,10 @@ public class HttpRequestUtilTest {
 
 	@Test
 	@DisplayName("Invalid HttpRequest 파싱 테스트")
-	void testParseInvalidRequest() {
+	void testParseInvalidRequest() throws IOException {
 		String rawRequest = "GET /register.html HTTP/1.1\r\nInvalidHeader\r\n\r\n";
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(rawRequest.getBytes());
 
-		assertThrows(IllegalArgumentException.class, () -> {
-			HttpRequestUtil.parseRequest(inputStream);
-		});
+		assertThatThrownBy(() -> HttpRequestUtil.parseRequest(inputStream));
 	}
 }

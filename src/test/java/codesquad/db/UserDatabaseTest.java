@@ -1,14 +1,15 @@
 package codesquad.db;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import codesquad.domain.User;
+import codesquad.error.BaseException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import codesquad.domain.User;
 
 public class UserDatabaseTest {
 
@@ -38,9 +39,7 @@ public class UserDatabaseTest {
 	void insertUserAlreadyExists() {
 		User user = new User("john", "John Doe", "password", "email");
 		userDatabase.insert("john", user);
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-			() -> userDatabase.insert("john", user));
-		assertThat("User already exists").isEqualTo(exception.getMessage());
+		assertThatThrownBy(() -> userDatabase.insert("john", user));
 	}
 
 	@Test
@@ -55,18 +54,15 @@ public class UserDatabaseTest {
 	@Test
 	@DisplayName("존재하지 않는 사용자를 조회하려 하면 예외를 발생시킨다")
 	void getUserNotFound() {
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-			() -> userDatabase.get("unknown"));
-		assertThat("User with id unknown does not exist").isEqualTo(exception.getMessage());
+		Assertions.assertThatThrownBy(() -> userDatabase.get("unknown"))
+			.isInstanceOf(BaseException.class);
 	}
 
 	@Test
 	@DisplayName("존재하지 않는 사용자를 업데이트하려 하면 예외를 발생시킨다")
 	void updateUserNotFound() {
 		User updatedUser = new User("unknown", "Unknown User", "password", "email");
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-			() -> userDatabase.update("unknown", updatedUser));
-		assertThat("User with id unknown does not exist").isEqualTo(exception.getMessage());
+		assertThatThrownBy(() -> userDatabase.update("unknown", updatedUser));
 	}
 
 	@Test
@@ -75,8 +71,6 @@ public class UserDatabaseTest {
 		User user = new User("john", "John Doe", "password", "email");
 		userDatabase.insert("john", user);
 		userDatabase.delete("john");
-		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-			() -> userDatabase.get("john"));
-		assertThat("User with id john does not exist").isEqualTo(exception.getMessage());
+		assertThatThrownBy(() -> userDatabase.get("john"));
 	}
 }

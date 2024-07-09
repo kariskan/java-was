@@ -1,6 +1,6 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,10 +41,11 @@ class HttpResponseTest {
 	void convertToString() {
 		HttpHeader httpHeader = HttpHeader.of();
 		byte[] body = "Hello, world!".getBytes();
-		HttpResponse httpResponse = new HttpResponse(new StatusLine(HttpProtocol.HTTP11, HttpStatus.OK), httpHeader,
-			new HttpBody(body));
+		HttpResponse httpResponse = new HttpResponse();
+		httpResponse.setStatusLine();
+		httpResponse.setBody(body);
 
-		String expectedResponse = httpResponse.getStatusLine().toString() + httpHeader.toString() + new String(body);
+		String expectedResponse = StatusLine.ok().toString() + httpHeader + new String(body);
 		assertThat(httpResponse.toString()).isEqualTo(expectedResponse);
 	}
 }

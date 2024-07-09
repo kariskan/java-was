@@ -1,14 +1,12 @@
 package codesquad.domain;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import codesquad.utils.StringUtils;
 import java.util.HashMap;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import codesquad.utils.StringUtils;
 
 public class HttpHeaderTest {
 
