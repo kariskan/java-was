@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.error.BaseException;
 import java.util.Arrays;
 
 public enum HttpMethod {
@@ -18,6 +19,6 @@ public enum HttpMethod {
 		return Arrays.stream(values())
 			.filter(httpMethod -> httpMethod.name().equals(method))
 			.findFirst()
-			.orElseThrow(() -> new IllegalArgumentException("unknown method: " + method));
+			.orElseThrow(() -> new BaseException(HttpStatus.METHOD_NOT_ALLOWED, "unknown method: " + method));
 	}
 }

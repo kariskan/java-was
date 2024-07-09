@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.error.BaseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,6 @@ public class Parameters {
 
 	public String getValueByKey(String key) {
 		return Optional.ofNullable(params.get(key))
-			.orElseThrow(() -> new IllegalArgumentException("Key " + key + " not found"));
+			.orElseThrow(() -> new BaseException(HttpStatus.BAD_REQUEST, "Key " + key + " not found"));
 	}
 }

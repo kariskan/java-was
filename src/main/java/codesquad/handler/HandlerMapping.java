@@ -1,6 +1,8 @@
 package codesquad.handler;
 
 import codesquad.domain.HttpRequest;
+import codesquad.domain.HttpStatus;
+import codesquad.error.BaseException;
 import java.net.URL;
 
 public class HandlerMapping {
@@ -17,7 +19,7 @@ public class HandlerMapping {
 
 	public static Handler getHandler(HttpRequest request) {
 		URL resource = HandlerMapping.class.getClassLoader().getResource(STATIC_PATH + request.requestLine().getUrl());
-		if (resource == null) {
+		if (!request.isGet() || resource == null) {
 			return getDynamicHandler(request);
 		}
 		return StaticRequestHandler.getInstance();
@@ -27,6 +29,12 @@ public class HandlerMapping {
 		if (request.isPost() && "/create".equals(request.requestLine().getUrl())) {
 			return SignUpHandler.getInstance();
 		}
-		throw new IllegalArgumentException("Invalid request");
+		if (request.isPost() && "/login".equals(request.requestLine().getUrl())) {
+			return LoginHandler.getInstance();
+		}
+		if (request.isPost() && "/logout".equals(request.requestLine().getUrl())) {
+			return LogoutHandler.getInstance();
+		}
+		throw new BaseException(HttpStatus.NOT_FOUND, "Invalid request");
 	}
 }

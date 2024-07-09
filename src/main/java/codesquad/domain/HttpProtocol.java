@@ -1,5 +1,6 @@
 package codesquad.domain;
 
+import codesquad.error.BaseException;
 import java.util.Arrays;
 
 public enum HttpProtocol {
@@ -16,7 +17,7 @@ public enum HttpProtocol {
 		return Arrays.stream(values())
 			.filter(httpProtocol -> httpProtocol.protocol.equals(protocol))
 			.findFirst()
-			.orElseThrow(() -> new IllegalArgumentException("Unknown protocol: " + protocol));
+			.orElseThrow(() -> new BaseException(HttpStatus.BAD_REQUEST, "Unknown protocol: " + protocol));
 	}
 
 	public String getProtocol() {

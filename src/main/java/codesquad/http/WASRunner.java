@@ -2,6 +2,7 @@ package codesquad.http;
 
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
+import codesquad.error.BaseException;
 import codesquad.handler.HandlerMapping;
 import codesquad.utils.HttpRequestUtil;
 import codesquad.utils.HttpResponseUtil;
@@ -27,12 +28,18 @@ public class WASRunner implements Runnable {
 			var bi = new BufferedInputStream(socket.getInputStream());
 			var bo = new BufferedOutputStream(socket.getOutputStream())
 		) {
-			HttpRequest request = HttpRequestUtil.parseRequest(bi);
 			HttpResponse response = new HttpResponse();
-			HandlerMapping.getHandler(request).doService(request, response);
-			HttpResponseUtil.writeResponse(bo, response);
-			socket.close();
-		} catch (IOException | IllegalArgumentException e) {
+			try {
+				HttpRequest request = HttpRequestUtil.parseRequest(bi);
+				HandlerMapping.getHandler(request).doService(request, response);
+			} catch (BaseException e) {
+				log.error("Error service request", e);
+				response.sendRedirect("/error.html");
+			} finally {
+				HttpResponseUtil.writeResponse(bo, response);
+				socket.close();
+			}
+		} catch (IOException e) {
 			log.error("io exception", e);
 		}
 	}
