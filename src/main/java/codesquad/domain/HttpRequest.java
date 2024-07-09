@@ -1,11 +1,13 @@
 package codesquad.domain;
 
+import codesquad.error.BaseException;
 import java.util.Arrays;
 
 public record HttpRequest(
 	RequestLine requestLine,
 	HttpHeader header,
-	HttpBody body
+	HttpBody body,
+	Cookie[] cookies
 ) {
 
 	public String getExtension() {
@@ -28,5 +30,15 @@ public record HttpRequest(
 
 	public Parameters getParameters() {
 		return requestLine.path().getParameters();
+	}
+
+	public Cookie getCookie(String name) {
+		if (cookies == null || cookies.length == 0) {
+			throw new BaseException(HttpStatus.BAD_REQUEST, "cookie not found");
+		}
+		return Arrays.stream(cookies)
+			.filter(cookie -> cookie.getName().equals(name))
+			.findFirst()
+			.orElseThrow(() -> new BaseException(HttpStatus.BAD_REQUEST, "cookie not found"));
 	}
 }
