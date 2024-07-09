@@ -30,7 +30,7 @@ public class HttpHeader {
 	}
 
 	public String getHeaderValue(String headerName) {
-		return headers.get(headerName);
+		return headers.getOrDefault(headerName, null);
 	}
 
 	public void setHeaderValue(String headerName, String headerValue) {
@@ -46,7 +46,7 @@ public class HttpHeader {
 	@Override
 	public String toString() {
 		return headers.entrySet().stream()
-			.map(e -> e.getKey() + ": " + e.getValue())
+			.map(e -> e.getKey() + ": " + String.join("; ", e.getValue()))
 			.collect(Collectors.joining(lineSeparator())) + lineSeparator() + lineSeparator();
 	}
 }
