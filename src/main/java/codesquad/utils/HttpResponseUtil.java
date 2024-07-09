@@ -12,7 +12,9 @@ public class HttpResponseUtil {
 	public static void writeResponse(OutputStream bo, HttpResponse response) throws IOException {
 		bo.write(response.getStatusLine().toString().getBytes());
 		bo.write(response.getHeader().toString().getBytes());
-		bo.write(response.getBody());
+		if (response.getBody() != null) {
+			bo.write(response.getBody());
+		}
 		bo.flush();
 	}
 }
