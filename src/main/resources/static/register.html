@@ -68,8 +68,27 @@
         const userId = document.getElementById('userId').value;
         const nickname = document.getElementById('nickname').value;
         const password = document.getElementById('password').value;
+        const email = userId + '@slipp.net';
 
-        window.location.href = `/create?userId=${encodeURIComponent(userId)}&password=${encodeURIComponent(password)}&nickname=${encodeURIComponent(nickname)}&email=${encodeURIComponent(userId + '@slipp.net')}`;
+        const data = new URLSearchParams();
+        data.append('userId', userId);
+        data.append('nickname', nickname);
+        data.append('password', password);
+        data.append('email', email);
+
+        fetch('/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: data.toString()
+        })
+                .then(response => {
+                  if (response.ok) {
+                    // 서버 응답이 성공적이면 리디렉션
+                    window.location.href = '/index.html'; // 성공 후 이동할 페이지 URL로 수정
+                  }
+                });
       });
     </script>
   </body>
