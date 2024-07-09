@@ -11,7 +11,10 @@ public enum HttpStatus {
 	UNAUTHORIZED(401, "Unauthorized"),
 	FORBIDDEN(403, "Forbidden"),
 	NOT_FOUND(404, "Not Found"),
+	METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
 	PAYLOAD_TOO_LARGE(413, "Payload Too Large"),
+	UNSUPPORTED_MEDIA_TYPE(415, "Unsupported Media Type"),
+	REQUEST_HEADER_FIELDS_TOO_LARGE(431, "Request Header Fields Too Large"),
 
 	INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
 	;
