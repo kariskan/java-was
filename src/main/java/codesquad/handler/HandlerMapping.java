@@ -25,7 +25,7 @@ public class HandlerMapping {
 	}
 
 	public static Handler getDynamicHandler(HttpRequest request) {
-		if (request.isGet() && "/create".equals(request.requestLine().getUrl())) {
+		if (request.isPost() && "/create".equals(request.requestLine().getUrl())) {
 			return SignUpHandler.getInstance();
 		}
 		throw new IllegalArgumentException("Invalid request");
