@@ -40,7 +40,7 @@ public class UserDatabaseTest {
 		userDatabase.insert("john", user);
 		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 			() -> userDatabase.insert("john", user));
-		assertThat("User with id john already exists").isEqualTo(exception.getMessage());
+		assertThat("User already exists").isEqualTo(exception.getMessage());
 	}
 
 	@Test

@@ -30,7 +30,7 @@ public class HandlerMappingTest {
 	@DisplayName("동적 요청에 대해 SignUpHandler를 반환하는지 테스트")
 	public void testGetDynamicHandler() {
 		HttpRequest request = new HttpRequest(
-			new RequestLine(HttpMethod.GET,
+			new RequestLine(HttpMethod.POST,
 				new Path("/create"), HttpProtocol.HTTP11),
 			new HttpHeader(null),
 			new HttpBody(null));
