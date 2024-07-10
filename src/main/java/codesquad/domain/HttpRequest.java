@@ -34,11 +34,25 @@ public record HttpRequest(
 
 	public Cookie getCookie(String name) {
 		if (cookies == null || cookies.length == 0) {
-			throw new BaseException(HttpStatus.BAD_REQUEST, "cookie not found");
+			return null;
 		}
 		return Arrays.stream(cookies)
 			.filter(cookie -> cookie.getName().equals(name))
 			.findFirst()
-			.orElseThrow(() -> new BaseException(HttpStatus.BAD_REQUEST, "cookie not found"));
+			.orElse(null);
+	}
+
+	public String getUrl() {
+		return requestLine.getUrl();
+	}
+
+	@Override
+	public String toString() {
+		return "HttpRequest{" +
+			"requestLine=" + requestLine +
+			", header=" + header +
+			", body=" + body +
+			", cookies=" + Arrays.toString(cookies) +
+			'}';
 	}
 }
