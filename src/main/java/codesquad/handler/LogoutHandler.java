@@ -4,6 +4,9 @@ import codesquad.db.SessionDatabase;
 import codesquad.domain.Cookie;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
+import codesquad.domain.HttpStatus;
+import codesquad.error.BaseException;
+import codesquad.utils.UserThreadLocal;
 import java.time.Duration;
 
 public class LogoutHandler extends DynamicHandler {
@@ -19,6 +22,9 @@ public class LogoutHandler extends DynamicHandler {
 
 	@Override
 	public void doPost(HttpRequest request, HttpResponse response) {
+		if (!UserThreadLocal.isLogin()) {
+			throw new BaseException(HttpStatus.BAD_REQUEST, "You are not logged in");
+		}
 		Cookie sid = request.getCookie("SID");
 		SessionDatabase.getInstance().delete(sid.getValue());
 		removeCookie(response);

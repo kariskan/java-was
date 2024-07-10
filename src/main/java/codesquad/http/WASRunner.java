@@ -3,9 +3,12 @@ package codesquad.http;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.error.BaseException;
+import codesquad.handler.Handler;
 import codesquad.handler.HandlerMapping;
 import codesquad.utils.HttpRequestUtil;
 import codesquad.utils.HttpResponseUtil;
+import codesquad.utils.ThreadLocalFilter;
+import codesquad.utils.UserThreadLocal;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -31,12 +34,14 @@ public class WASRunner implements Runnable {
 			HttpResponse response = new HttpResponse();
 			try {
 				HttpRequest request = HttpRequestUtil.parseRequest(bi);
+				ThreadLocalFilter.doFilter(request);
 				HandlerMapping.getHandler(request).doService(request, response);
 			} catch (BaseException e) {
 				log.error("Error service request", e);
 				response.sendRedirect("/error.html");
 			} finally {
 				HttpResponseUtil.writeResponse(bo, response);
+				UserThreadLocal.remove();
 				socket.close();
 			}
 		} catch (IOException e) {

@@ -1,0 +1,27 @@
+package codesquad.utils;
+
+import codesquad.db.SessionDatabase;
+import codesquad.db.UserDatabase;
+import codesquad.domain.Cookie;
+import codesquad.domain.HttpRequest;
+import codesquad.domain.User;
+
+public class ThreadLocalFilter {
+
+	public static void doFilter(HttpRequest request) {
+		User user = getUserByCookie(request);
+		if (user == null) {
+			return;
+		}
+		UserThreadLocal.set(user);
+	}
+
+	private static User getUserByCookie(HttpRequest request) {
+		Cookie cookie = request.getCookie("SID");
+		if (cookie != null) {
+			String userId = SessionDatabase.getInstance().get(cookie.getValue());
+			return UserDatabase.getInstance().get(userId);
+		}
+		return null;
+	}
+}
