@@ -21,4 +21,12 @@ public class Path {
 	public Parameters getParameters() {
 		return parameters;
 	}
+
+	@Override
+	public String toString() {
+		return "Path{" +
+			"url='" + url + '\'' +
+			", parameters=" + parameters +
+			'}';
+	}
 }

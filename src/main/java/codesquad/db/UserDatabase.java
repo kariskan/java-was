@@ -3,6 +3,8 @@ package codesquad.db;
 import codesquad.domain.HttpStatus;
 import codesquad.domain.User;
 import codesquad.error.BaseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,5 +54,9 @@ public class UserDatabase implements Database<User> {
 
 	public void clear() {
 		users.clear();
+	}
+
+	public List<User> findAll() {
+		return new ArrayList<>(users.values());
 	}
 }

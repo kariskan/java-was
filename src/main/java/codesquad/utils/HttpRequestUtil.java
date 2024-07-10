@@ -14,6 +14,7 @@ import codesquad.domain.RequestLine;
 import codesquad.error.BaseException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class HttpRequestUtil {
 
 		HttpMethod httpMethod = HttpMethod.from(split[0]);
 		HttpProtocol httpProtocol = HttpProtocol.from(split[2]);
-		return new RequestLine(httpMethod, new Path(split[1]), httpProtocol);
+		return new RequestLine(httpMethod, new Path(URLDecoder.decode(split[1], "UTF-8")), httpProtocol);
 	}
 
 	private static HttpHeader parseHeader(String[] split) throws IOException {
