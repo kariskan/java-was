@@ -44,7 +44,7 @@ public class LoginHandler extends DynamicHandler {
 
 	private void setResponse(HttpResponse response) {
 		response.setStatusLine(HttpStatus.FOUND);
-		HttpHeader header = new HttpHeader(new HashMap<>(Map.of("Location", "/main.html")));
+		HttpHeader header = new HttpHeader(new HashMap<>(Map.of("Location", "/index.html")));
 		header.setDefaultHeaders();
 		header.setHeaderValue("Content-Length", "0");
 		response.setHeader(header);
