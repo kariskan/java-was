@@ -1,5 +1,7 @@
 package codesquad.domain;
 
+import java.util.Arrays;
+
 public enum HttpStatus {
 
 	OK(200, "OK"),
@@ -25,6 +27,13 @@ public enum HttpStatus {
 	HttpStatus(int code, String value) {
 		this.code = code;
 		this.value = value;
+	}
+
+	public static HttpStatus from(String code) {
+		return Arrays.stream(values())
+			.filter(httpStatus -> String.valueOf(httpStatus.getCode()).equals(code))
+			.findFirst()
+			.orElse(null);
 	}
 
 	public int getCode() {

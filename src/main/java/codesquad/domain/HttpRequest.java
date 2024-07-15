@@ -46,6 +46,10 @@ public record HttpRequest(
 		return requestLine.getUrl();
 	}
 
+	public HttpMethod getMethod() {
+		return requestLine.method();
+	}
+
 	@Override
 	public String toString() {
 		return "HttpRequest{" +

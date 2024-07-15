@@ -1,31 +1,28 @@
 package codesquad.handler;
 
-import codesquad.db.SessionDatabase;
-import codesquad.db.UserDatabase;
-import codesquad.domain.Cookie;
-import codesquad.domain.HttpHeader;
-import codesquad.domain.HttpRequest;
-import codesquad.domain.HttpResponse;
-import codesquad.domain.HttpStatus;
-import codesquad.domain.User;
-import codesquad.error.BaseException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class LoginHandler extends DynamicHandler {
+import codesquad.annotation.RequestMapping;
+import codesquad.db.SessionDatabase;
+import codesquad.db.UserDatabase;
+import codesquad.domain.Cookie;
+import codesquad.domain.HttpHeader;
+import codesquad.domain.HttpMethod;
+import codesquad.domain.HttpRequest;
+import codesquad.domain.HttpResponse;
+import codesquad.domain.HttpStatus;
+import codesquad.domain.User;
+import codesquad.error.BaseException;
 
-	private static final LoginHandler instance = new LoginHandler();
+public class LoginHandler {
 
 	private LoginHandler() {
 	}
 
-	public static LoginHandler getInstance() {
-		return instance;
-	}
-
-	@Override
+	@RequestMapping(httpMethod = HttpMethod.POST, url = "/login")
 	public void doPost(HttpRequest request, HttpResponse response) {
 		Map<String, String> form = request.body().bodyToMap();
 		UserDatabase userDatabase = UserDatabase.getInstance();

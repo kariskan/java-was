@@ -1,25 +1,29 @@
 package codesquad.handler;
 
-import codesquad.db.UserDatabase;
-import codesquad.domain.ContentType;
-import codesquad.domain.HttpHeader;
-import codesquad.domain.HttpRequest;
-import codesquad.domain.HttpResponse;
-import codesquad.domain.HttpStatus;
-import codesquad.domain.User;
-import codesquad.error.BaseException;
-import codesquad.utils.UserThreadLocal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StaticRequestHandler implements Handler {
+import codesquad.annotation.RequestMapping;
+import codesquad.db.UserDatabase;
+import codesquad.domain.ContentType;
+import codesquad.domain.HttpHeader;
+import codesquad.domain.HttpMethod;
+import codesquad.domain.HttpRequest;
+import codesquad.domain.HttpResponse;
+import codesquad.domain.HttpStatus;
+import codesquad.domain.RequestLine;
+import codesquad.domain.User;
+import codesquad.error.BaseException;
+import codesquad.utils.UserThreadLocal;
+
+public class StaticRequestHandler {
 
 	public static final String STATIC_PATH = "static";
-	private static final StaticRequestHandler instance = new StaticRequestHandler();
 	private final UserDatabase userDatabase = UserDatabase.getInstance();
 
 	private final Logger log = LoggerFactory.getLogger(StaticRequestHandler.class);
@@ -27,11 +31,7 @@ public class StaticRequestHandler implements Handler {
 	private StaticRequestHandler() {
 	}
 
-	public static StaticRequestHandler getInstance() {
-		return instance;
-	}
-
-	@Override
+	@RequestMapping(httpMethod = HttpMethod.GET, url = "/static")
 	public void doService(HttpRequest request, HttpResponse response) {
 		try {
 			byte[] body = readBytesFromFile(request.requestLine().getUrl());
@@ -45,6 +45,10 @@ public class StaticRequestHandler implements Handler {
 			}
 			if (request.isGet() && request.getUrl().equals("/error.html")) {
 				body = applyErrorPlaceHolder(body, request);
+				response.setStatusLine(HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
+				response.setBody(body);
+				response.setHeader(makeHttpHeader(body.length, request));
+				return;
 			}
 			HttpHeader header = makeHttpHeader(body.length, request);
 			setResponse(response, header, body);

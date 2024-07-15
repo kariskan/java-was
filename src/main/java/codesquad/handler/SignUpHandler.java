@@ -1,26 +1,23 @@
 package codesquad.handler;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import codesquad.annotation.RequestMapping;
 import codesquad.db.UserDatabase;
 import codesquad.domain.HttpHeader;
+import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
 import codesquad.domain.User;
-import java.util.HashMap;
-import java.util.Map;
 
-public class SignUpHandler extends DynamicHandler {
-
-	private static final SignUpHandler instance = new SignUpHandler();
+public class SignUpHandler {
 
 	private SignUpHandler() {
 	}
 
-	public static SignUpHandler getInstance() {
-		return instance;
-	}
-
-	@Override
+	@RequestMapping(httpMethod = HttpMethod.POST, url = "/create")
 	public void doPost(HttpRequest request, HttpResponse response) {
 		User user = getUser(request);
 		UserDatabase userDatabase = UserDatabase.getInstance();

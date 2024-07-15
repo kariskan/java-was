@@ -1,26 +1,23 @@
 package codesquad.handler;
 
+import java.time.Duration;
+
+import codesquad.annotation.RequestMapping;
 import codesquad.db.SessionDatabase;
 import codesquad.domain.Cookie;
+import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
 import codesquad.utils.UserThreadLocal;
-import java.time.Duration;
 
-public class LogoutHandler extends DynamicHandler {
-
-	private static final LogoutHandler instance = new LogoutHandler();
+public class LogoutHandler {
 
 	private LogoutHandler() {
 	}
 
-	public static LogoutHandler getInstance() {
-		return instance;
-	}
-
-	@Override
+	@RequestMapping(httpMethod = HttpMethod.POST, url = "/logout")
 	public void doPost(HttpRequest request, HttpResponse response) {
 		if (!UserThreadLocal.isLogin()) {
 			throw new BaseException(HttpStatus.BAD_REQUEST, "You are not logged in");
