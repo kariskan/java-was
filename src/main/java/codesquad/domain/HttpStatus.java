@@ -44,7 +44,6 @@ public enum HttpStatus {
 		return value;
 	}
 
-
 	@Override
 	public String toString() {
 		return code + " " + value;

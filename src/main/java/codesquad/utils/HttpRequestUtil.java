@@ -1,6 +1,15 @@
 package codesquad.utils;
 
-import static codesquad.utils.StringUtils.lineSeparator;
+import static codesquad.utils.StringUtils.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import codesquad.domain.Cookie;
 import codesquad.domain.HttpBody;
@@ -12,13 +21,6 @@ import codesquad.domain.HttpStatus;
 import codesquad.domain.Path;
 import codesquad.domain.RequestLine;
 import codesquad.error.BaseException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HttpRequestUtil {
 
@@ -76,7 +78,7 @@ public class HttpRequestUtil {
 		byte[] bytes = new byte[MAX_HEADER_SIZE];
 		while (idx < MAX_HEADER_SIZE) {
 			int read = bi.read();
-			bytes[idx++] = (byte) read;
+			bytes[idx++] = (byte)read;
 			if (checkHeaderEnd(idx, bytes)) {
 				break;
 			}
@@ -87,7 +89,7 @@ public class HttpRequestUtil {
 
 	private static boolean checkHeaderEnd(int idx, byte[] bytes) {
 		return idx >= 4 && bytes[idx - 4] == '\r' && bytes[idx - 3] == '\n' && bytes[idx - 2] == '\r'
-			&& bytes[idx - 1] == '\n';
+			   && bytes[idx - 1] == '\n';
 	}
 
 	private static RequestLine parseRequestLine(String line) throws IOException {

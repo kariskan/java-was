@@ -16,7 +16,6 @@ import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
-import codesquad.domain.RequestLine;
 import codesquad.domain.User;
 import codesquad.error.BaseException;
 import codesquad.utils.UserThreadLocal;
@@ -45,7 +44,8 @@ public class StaticRequestHandler {
 			}
 			if (request.isGet() && request.getUrl().equals("/error.html")) {
 				body = applyErrorPlaceHolder(body, request);
-				response.setStatusLine(HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
+				response.setStatusLine(
+					HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
 				response.setBody(body);
 				response.setHeader(makeHttpHeader(body.length, request));
 				return;

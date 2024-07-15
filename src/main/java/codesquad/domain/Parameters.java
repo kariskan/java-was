@@ -1,9 +1,10 @@
 package codesquad.domain;
 
-import codesquad.error.BaseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import codesquad.error.BaseException;
 
 public class Parameters {
 	private Map<String, String> params;

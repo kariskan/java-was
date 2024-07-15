@@ -28,6 +28,25 @@ public class WASRunner implements Runnable {
 		this.socket = socket;
 	}
 
+	private static void invokeMethod(Method method, HttpRequest request, HttpResponse response) throws
+		IllegalAccessException {
+		if (method != null) {
+			Object instance = HandlerMapping.getHandlerInstance(method.getDeclaringClass());
+			try {
+				method.invoke(instance, request, response);
+			} catch (InvocationTargetException e) {
+				Throwable targetException = e.getCause();
+				if (targetException instanceof BaseException) {
+					throw (BaseException)targetException;
+				} else {
+					response.sendRedirect("/error.html?statusCode=500&message=Internal%20Server%20Error");
+				}
+			}
+		} else {
+			response.sendRedirect("/error.html?statusCode=404&message=Not%20Found");
+		}
+	}
+
 	@Override
 	public void run() {
 		try (
@@ -50,25 +69,6 @@ public class WASRunner implements Runnable {
 			}
 		} catch (IOException | IllegalAccessException e) {
 			log.error("io exception", e);
-		}
-	}
-
-	private static void invokeMethod(Method method, HttpRequest request, HttpResponse response) throws
-		IllegalAccessException {
-		if (method != null) {
-			Object instance = HandlerMapping.getHandlerInstance(method.getDeclaringClass());
-			try {
-				method.invoke(instance, request, response);
-			} catch (InvocationTargetException e) {
-				Throwable targetException = e.getCause();
-				if (targetException instanceof BaseException) {
-					throw (BaseException)targetException;
-				} else {
-					response.sendRedirect("/error.html?statusCode=500&message=Internal%20Server%20Error");
-				}
-			}
-		} else {
-			response.sendRedirect("/error.html?statusCode=404&message=Not%20Found");
 		}
 	}
 }

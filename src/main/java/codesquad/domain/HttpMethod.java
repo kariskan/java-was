@@ -1,7 +1,8 @@
 package codesquad.domain;
 
-import codesquad.error.BaseException;
 import java.util.Arrays;
+
+import codesquad.error.BaseException;
 
 public enum HttpMethod {
 
