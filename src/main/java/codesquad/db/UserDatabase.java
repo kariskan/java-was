@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import codesquad.domain.HttpStatus;
 import codesquad.data.User;
+import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
 
 public class UserDatabase implements Database<User> {

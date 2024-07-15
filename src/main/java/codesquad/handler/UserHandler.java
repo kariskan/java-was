@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import codesquad.annotation.LoginCheck;
 import codesquad.annotation.RequestMapping;
+import codesquad.data.User;
 import codesquad.db.SessionDatabase;
 import codesquad.db.UserDatabase;
 import codesquad.domain.Cookie;
@@ -15,7 +16,6 @@ import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
-import codesquad.data.User;
 import codesquad.error.BaseException;
 import codesquad.utils.UserThreadLocal;
 

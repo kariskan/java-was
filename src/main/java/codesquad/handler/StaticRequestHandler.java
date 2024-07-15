@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import codesquad.annotation.RequestMapping;
+import codesquad.data.User;
 import codesquad.db.UserDatabase;
 import codesquad.domain.ContentType;
 import codesquad.domain.HttpHeader;
@@ -16,7 +17,6 @@ import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
-import codesquad.data.User;
 import codesquad.error.BaseException;
 import codesquad.utils.UserThreadLocal;
 
