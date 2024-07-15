@@ -30,18 +30,19 @@ public class JdbcTemplate {
 	private JdbcTemplate() {
 	}
 
-	public static int update(String sql, Map<SQLType, Object> params) {
+	public static int update(String sql, List<Map.Entry<SQLType, Object>> params) {
 		try (
 			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			PreparedStatement ps = getPreparedStatement(conn, sql, params)
 		) {
 			return ps.executeUpdate();
 		} catch (SQLException e) {
+			log.error(e.getMessage(), e);
 			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
 		}
 	}
 
-	public static <T> List<T> execute(String sql, Class<T> clazz, Map<SQLType, Object> params) {
+	public static <T> List<T> execute(String sql, Class<T> clazz, List<Map.Entry<SQLType, Object>> params) {
 		List<T> result = new ArrayList<>();
 		try (
 			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -55,6 +56,7 @@ public class JdbcTemplate {
 				result.add((T)o);
 			}
 		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			log.error(e.getMessage(), e);
 			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
 		}
 		return result;
@@ -87,16 +89,17 @@ public class JdbcTemplate {
 		return constructor;
 	}
 
-	public static PreparedStatement getPreparedStatement(Connection conn, String sql, Map<SQLType, Object> params)
-		throws SQLException {
+	public static PreparedStatement getPreparedStatement(Connection conn, String sql,
+		List<Map.Entry<SQLType, Object>> params) throws SQLException {
 		PreparedStatement ps = conn.prepareStatement(sql);
 		if (params == null) {
 			return ps;
 		}
-		for (Map.Entry<SQLType, Object> entry : params.entrySet()) {
+		int idx = 1;
+		for (Map.Entry<SQLType, Object> entry : params) {
 			SQLType sqlType = entry.getKey();
 			Object value = entry.getValue();
-			ps.setObject(1, value, sqlType);
+			ps.setObject(idx++, value, sqlType);
 		}
 		return ps;
 	}
