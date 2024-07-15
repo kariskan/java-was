@@ -4,7 +4,7 @@ import codesquad.db.SessionDatabase;
 import codesquad.db.UserDatabase;
 import codesquad.domain.Cookie;
 import codesquad.domain.HttpRequest;
-import codesquad.domain.User;
+import codesquad.data.User;
 import codesquad.utils.UserThreadLocal;
 
 public class ThreadLocalFilter {

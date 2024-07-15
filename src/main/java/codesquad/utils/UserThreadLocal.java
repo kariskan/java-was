@@ -1,6 +1,6 @@
 package codesquad.utils;
 
-import codesquad.domain.User;
+import codesquad.data.User;
 
 public class UserThreadLocal {
 

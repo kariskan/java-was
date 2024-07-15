@@ -1,4 +1,4 @@
-package codesquad.domain;
+package codesquad.data;
 
 public record User(
 	String userId,

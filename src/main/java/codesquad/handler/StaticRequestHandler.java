@@ -16,7 +16,7 @@ import codesquad.domain.HttpMethod;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
-import codesquad.domain.User;
+import codesquad.data.User;
 import codesquad.error.BaseException;
 import codesquad.utils.UserThreadLocal;
 
