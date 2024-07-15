@@ -33,21 +33,8 @@ public class StaticRequestHandler {
 	@RequestMapping(httpMethod = HttpMethod.GET, url = "/static")
 	public void doService(HttpRequest request, HttpResponse response) {
 		try {
-			byte[] body = readBytesFromFile(request.requestLine().getUrl());
-			body = applyDynamicHeaderComponents(body);
-			if (request.isGet() && request.getUrl().equals("/user/list.html")) {
-				if (!UserThreadLocal.isLogin()) {
-					response.sendRedirect("/user/login.html");
-					return;
-				}
-				body = applyUserListHtml(body);
-			}
-			if (request.isGet() && request.getUrl().equals("/error.html")) {
-				body = applyErrorPlaceHolder(body, request);
-				response.setStatusLine(
-					HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
-				response.setBody(body);
-				response.setHeader(makeHttpHeader(body.length, request));
+			byte[] body = applyDynamicComponents(request, response);
+			if (body == null) {
 				return;
 			}
 			HttpHeader header = makeHttpHeader(body.length, request);
@@ -55,6 +42,27 @@ public class StaticRequestHandler {
 		} catch (IOException e) {
 			log.error("io exception", e);
 		}
+	}
+
+	private byte[] applyDynamicComponents(HttpRequest request, HttpResponse response) throws IOException {
+		byte[] body = readBytesFromFile(request.requestLine().getUrl());
+		body = applyDynamicHeaderComponents(body);
+		if (request.isGet() && request.getUrl().equals("/user/list.html")) {
+			body = applyUserListHtml(body);
+		}
+		if (request.isGet() && request.getUrl().equals("/error.html")) {
+			setErrorResponse(request, response, body);
+			return null;
+		}
+		return body;
+	}
+
+	private void setErrorResponse(HttpRequest request, HttpResponse response, byte[] body) {
+		body = applyErrorPlaceHolder(body, request);
+		response.setStatusLine(
+			HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
+		response.setBody(body);
+		response.setHeader(makeHttpHeader(body.length, request));
 	}
 
 	private void setResponse(HttpResponse response, HttpHeader header, byte[] body) {

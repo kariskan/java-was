@@ -10,13 +10,14 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import codesquad.annotation.LoginCheck;
 import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.error.BaseException;
 import codesquad.handler.mapping.HandlerMapping;
 import codesquad.utils.HttpRequestUtil;
 import codesquad.utils.HttpResponseUtil;
-import codesquad.utils.ThreadLocalFilter;
+import codesquad.filter.ThreadLocalFilter;
 import codesquad.utils.UserThreadLocal;
 
 public class WASRunner implements Runnable {
@@ -31,6 +32,10 @@ public class WASRunner implements Runnable {
 	private static void invokeMethod(Method method, HttpRequest request, HttpResponse response) throws
 		IllegalAccessException {
 		if (method != null) {
+			if (method.isAnnotationPresent(LoginCheck.class) && !UserThreadLocal.isLogin()) {
+				response.sendRedirect("/user/login.html");
+				return;
+			}
 			Object instance = HandlerMapping.getHandlerInstance(method.getDeclaringClass());
 			try {
 				method.invoke(instance, request, response);
