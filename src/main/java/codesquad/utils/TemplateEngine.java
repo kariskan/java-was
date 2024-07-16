@@ -30,7 +30,6 @@ public class TemplateEngine {
 		try {
 			template = renderVariables(template, context);
 			template = renderIfElseStatements(template, context);
-			template = renderIfStatements(template, context);
 			template = renderForEachStatements(template, context);
 			template = renderIncludes(template, context);
 		} catch (IOException e) {
@@ -112,24 +111,6 @@ public class TemplateEngine {
 			} else {
 				elseContent = render(elseContent, context); // else 조건 내부의 템플릿 처리
 				matcher.appendReplacement(sb, elseContent);
-			}
-		}
-		matcher.appendTail(sb);
-		return sb.toString();
-	}
-
-	private static String renderIfStatements(String template, Map<String, Object> context) throws IOException {
-		Matcher matcher = IF_PATTERN.matcher(template);
-		StringBuilder sb = new StringBuilder();
-		while (matcher.find()) {
-			String condition = matcher.group(1);
-			String content = matcher.group(2);
-			boolean conditionValue = Boolean.parseBoolean(context.getOrDefault(condition, false).toString());
-			if (conditionValue) {
-				content = render(content, context); // if 조건 내부의 템플릿 처리
-				matcher.appendReplacement(sb, content);
-			} else {
-				matcher.appendReplacement(sb, "");
 			}
 		}
 		matcher.appendTail(sb);
