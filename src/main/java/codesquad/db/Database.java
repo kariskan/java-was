@@ -1,12 +1,16 @@
 package codesquad.db;
 
-public interface Database<T> {
+import java.util.List;
 
-	void insert(String id, T t);
+public interface Database<T, E> {
 
-	T get(String id);
+	void insert(T id, E t);
 
-	void update(String id, T t);
+	E get(T id);
 
-	void delete(String id);
+	void update(T id, E t);
+
+	void delete(T id);
+
+	List<E> findAll();
 }
