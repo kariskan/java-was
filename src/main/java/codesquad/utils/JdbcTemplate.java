@@ -1,5 +1,7 @@
 package codesquad.utils;
 
+import codesquad.domain.HttpStatus;
+import codesquad.error.BaseException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,13 +13,8 @@ import java.sql.SQLException;
 import java.sql.SQLType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import codesquad.domain.HttpStatus;
-import codesquad.error.BaseException;
 
 public class JdbcTemplate {
 
@@ -30,7 +27,7 @@ public class JdbcTemplate {
 	private JdbcTemplate() {
 	}
 
-	public static int update(String sql, List<Map.Entry<SQLType, Object>> params) {
+	public static int update(String sql, List<Pair<SQLType, Object>> params) {
 		try (
 			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			PreparedStatement ps = getPreparedStatement(conn, sql, params)
@@ -42,7 +39,7 @@ public class JdbcTemplate {
 		}
 	}
 
-	public static <T> List<T> execute(String sql, Class<T> clazz, List<Map.Entry<SQLType, Object>> params) {
+	public static <T> List<T> execute(String sql, Class<T> clazz, List<Pair<SQLType, Object>> params) {
 		List<T> result = new ArrayList<>();
 		try (
 			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
@@ -53,13 +50,36 @@ public class JdbcTemplate {
 				Constructor<?> constructor = getConstructor(clazz);
 				Object[] parameters = getClassParameters(clazz, rs);
 				Object o = constructor.newInstance(parameters);
-				result.add((T)o);
+				result.add((T) o);
 			}
 		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 			log.error(e.getMessage(), e);
 			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
 		}
 		return result;
+	}
+
+	public static <T> T executeOne(String sql, Class<T> clazz, List<Pair<SQLType, Object>> params) {
+		List<T> result = new ArrayList<>();
+		try (
+			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			PreparedStatement ps = getPreparedStatement(conn, sql, params);
+			ResultSet rs = ps.executeQuery()
+		) {
+			while (rs.next()) {
+				Constructor<?> constructor = getConstructor(clazz);
+				Object[] parameters = getClassParameters(clazz, rs);
+				Object o = constructor.newInstance(parameters);
+				result.add((T) o);
+			}
+		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			log.error(e.getMessage(), e);
+			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+		}
+		if (result.isEmpty()) {
+			return null;
+		}
+		return result.get(0);
 	}
 
 	private static <T> Object[] getClassParameters(Class<T> clazz, ResultSet rs) throws SQLException {
@@ -90,15 +110,15 @@ public class JdbcTemplate {
 	}
 
 	public static PreparedStatement getPreparedStatement(Connection conn, String sql,
-		List<Map.Entry<SQLType, Object>> params) throws SQLException {
+														 List<Pair<SQLType, Object>> params) throws SQLException {
 		PreparedStatement ps = conn.prepareStatement(sql);
 		if (params == null) {
 			return ps;
 		}
 		int idx = 1;
-		for (Map.Entry<SQLType, Object> entry : params) {
-			SQLType sqlType = entry.getKey();
-			Object value = entry.getValue();
+		for (Pair<SQLType, Object> pair : params) {
+			SQLType sqlType = pair.getLeft();
+			Object value = pair.getRight();
 			ps.setObject(idx++, value, sqlType);
 		}
 		return ps;
