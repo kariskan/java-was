@@ -1,13 +1,5 @@
 package codesquad.handler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import codesquad.annotation.RequestMapping;
 import codesquad.data.User;
 import codesquad.db.UserDatabase;
@@ -18,13 +10,21 @@ import codesquad.domain.HttpRequest;
 import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
+import codesquad.utils.TemplateEngine;
 import codesquad.utils.UserThreadLocal;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StaticRequestHandler {
 
 	public static final String STATIC_PATH = "static";
 	private final UserDatabase userDatabase = UserDatabase.getInstance();
-
 	private final Logger log = LoggerFactory.getLogger(StaticRequestHandler.class);
 
 	private StaticRequestHandler() {
@@ -46,21 +46,29 @@ public class StaticRequestHandler {
 
 	private byte[] applyDynamicComponents(HttpRequest request, HttpResponse response) throws IOException {
 		byte[] body = readBytesFromFile(request.requestLine().getUrl());
-		body = applyDynamicHeaderComponents(body);
+		Map<String, Object> context = new HashMap<>();
+//		body = applyDynamicHeaderComponents(body);
 		if (request.isGet() && request.getUrl().equals("/user/list.html")) {
-			body = applyUserListHtml(body);
+			context.put("users", userDatabase.findAll());
+		}
+		if (UserThreadLocal.isLogin()) {
+			context.put("nickname", UserThreadLocal.get().userId());
+			context.put("isLogin", true);
 		}
 		if (request.isGet() && request.getUrl().equals("/error.html")) {
-			setErrorResponse(request, response, body);
+			setErrorResponse(request, response, body, context);
 			return null;
 		}
-		return body;
+		return TemplateEngine.render(new String(body), context).getBytes();
 	}
 
-	private void setErrorResponse(HttpRequest request, HttpResponse response, byte[] body) {
-		body = applyErrorPlaceHolder(body, request);
-		response.setStatusLine(
-			HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
+	private void setErrorResponse(HttpRequest request, HttpResponse response, byte[] body,
+								  Map<String, Object> context) {
+		context.put("statusCode", request.getParameters().getValueByKey("statusCode"));
+		context.put("message", request.getParameters().getValueByKey("message"));
+		String html = TemplateEngine.render(new String(body), context);
+		body = html.getBytes();
+		response.setStatusLine(HttpStatus.from(request.getParameters().getValueByKey("statusCode").split(" ")[0]));
 		response.setBody(body);
 		response.setHeader(makeHttpHeader(body.length, request));
 	}
@@ -86,47 +94,5 @@ public class StaticRequestHandler {
 		try (InputStream inputStream = resource.openStream()) {
 			return inputStream.readAllBytes();
 		}
-	}
-
-	private byte[] applyDynamicHeaderComponents(byte[] body) throws IOException {
-		String html = new String(body);
-		String headerFile = UserThreadLocal.isLogin() ? "/login_header.html" : "/logout_header.html";
-		byte[] headerBytes = readBytesFromFile(headerFile);
-		String headerHtml = new String(headerBytes);
-
-		if (UserThreadLocal.isLogin()) {
-			String nickname = UserThreadLocal.get().nickname();
-			headerHtml = headerHtml.replace("{{nickname}}", nickname);
-		}
-
-		html = html.replace("<div class=\"container\">", "<div class=\"container\">" + headerHtml);
-		return html.getBytes();
-	}
-
-	private byte[] applyUserListHtml(byte[] body) {
-		String templateHtml = new String(body);
-
-		List<User> users = userDatabase.findAll();
-		StringBuilder userListHtml = new StringBuilder();
-		for (User user : users) {
-			userListHtml.append("<tr>");
-			userListHtml.append("<td>").append(user.userId()).append("</td>");
-			userListHtml.append("<td>").append(user.nickname()).append("</td>");
-			userListHtml.append("<td>").append(user.email()).append("</td>");
-			userListHtml.append("</tr>");
-		}
-
-		templateHtml = templateHtml.replace("<!-- USER_LIST_PLACEHOLDER -->", userListHtml.toString());
-		return templateHtml.getBytes();
-	}
-
-	private byte[] applyErrorPlaceHolder(byte[] body, HttpRequest request) {
-		String statusCode = request.getParameters().getValueByKey("statusCode");
-		String message = request.getParameters().getValueByKey("message");
-		String templateHtml = new String(body);
-
-		templateHtml = templateHtml.replace("{{statusCode}}", statusCode);
-		templateHtml = templateHtml.replace("{{message}}", message);
-		return templateHtml.getBytes();
 	}
 }

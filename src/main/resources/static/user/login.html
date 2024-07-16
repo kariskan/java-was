@@ -8,6 +8,42 @@
 </head>
 <body>
 <div class="container">
+    {% if isLogin %}
+    <header class="header">
+        <a href="/index.html"><img src="../img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <span class="btn_size_s">{{nickname}} 님 반갑습니다!</span>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/write">글쓰기</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/user/list">유저 목록</a>
+            </li>
+            <li class="header__menu__item">
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn btn_size_s">로그아웃</button>
+                </form>
+            </li>
+        </ul>
+    </header>
+    {% else %}
+    <header class="header">
+        <a href="/index.html"><img src="../img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/user/login.html">로그인</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/user/list">유저 목록</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/register.html">회원 가입</a>
+            </li>
+        </ul>
+    </header>
+    {% endif %}
     <div class="page">
         <h2 class="page-title">로그인</h2>
         <form class="form" action="/login" method="POST">
