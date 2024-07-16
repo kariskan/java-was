@@ -2,8 +2,6 @@ package codesquad.domain;
 
 import java.util.Arrays;
 
-import codesquad.error.BaseException;
-
 public enum ContentType {
 
 	HTML("text/html", ".html"),
@@ -26,7 +24,7 @@ public enum ContentType {
 		return Arrays.stream(values())
 			.filter(contentType -> contentType.getExtension().equalsIgnoreCase(extension))
 			.findFirst()
-			.orElseThrow(() -> new BaseException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "unsupported content type"));
+			.orElse(HTML);
 	}
 
 	public String getMimeType() {

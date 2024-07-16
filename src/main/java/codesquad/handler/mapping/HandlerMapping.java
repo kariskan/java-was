@@ -1,5 +1,9 @@
 package codesquad.handler.mapping;
 
+import codesquad.annotation.RequestMapping;
+import codesquad.domain.HttpRequest;
+import codesquad.domain.HttpStatus;
+import codesquad.error.BaseException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -14,18 +18,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import codesquad.annotation.RequestMapping;
-import codesquad.domain.HttpRequest;
 
 public class HandlerMapping {
 
 	private static final Logger log = LoggerFactory.getLogger(HandlerMapping.class);
-	private static final Map<String, Method> handlerMethods = new HashMap<>();
+	private static final Map<Pattern, Method> handlerMethods = new HashMap<>();
 	private static final Map<Class<?>, Object> handlerInstances = new HashMap<>();
+	private static Method staticResourceHandler;
 
 	static {
 		initialize();
@@ -45,8 +47,14 @@ public class HandlerMapping {
 				for (Method method : clazz.getDeclaredMethods()) {
 					if (method.isAnnotationPresent(RequestMapping.class)) {
 						RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-						String key = mapping.httpMethod() + " " + mapping.url();
-						handlerMethods.put(key, method);
+						String urlPattern = mapping.url();
+						if ("/static".equals(urlPattern)) {
+							staticResourceHandler = method;
+						} else {
+							String regex = urlPattern.replaceAll("\\{[^/]+\\}", "[^/]+");
+							Pattern pattern = Pattern.compile(mapping.httpMethod() + " " + regex);
+							handlerMethods.put(pattern, method);
+						}
 					}
 				}
 			}
@@ -57,10 +65,26 @@ public class HandlerMapping {
 
 	public static Method getHandler(HttpRequest request) {
 		String key = request.getMethod() + " " + request.getUrl();
-		if (handlerMethods.get(key) == null) {
-			return handlerMethods.get("GET /static");
+		boolean urlMatched = false;
+
+		for (Pattern pattern : handlerMethods.keySet()) {
+			if (pattern.matcher(key).matches()) {
+				return handlerMethods.get(pattern);
+			}
+			if (pattern.matcher(".* " + request.getUrl()).matches()) {
+				urlMatched = true;
+			}
 		}
-		return handlerMethods.get(key);
+
+		if (request.getUrl().matches(".*\\.(html|css|js|png|jpg|jpeg|gif|ico|svg)$")) {
+			return staticResourceHandler;
+		}
+
+		if (urlMatched) {
+			throw new BaseException(HttpStatus.METHOD_NOT_ALLOWED, "Method not allowed");
+		}
+
+		throw new BaseException(HttpStatus.NOT_FOUND, "Not Found");
 	}
 
 	public static Object getHandlerInstance(Class<?> clazz) {
@@ -75,7 +99,7 @@ public class HandlerMapping {
 			URL resource = resources.nextElement();
 			String protocol = resource.getProtocol();
 			if ("jar".equals(protocol)) {
-				JarURLConnection jarURLConnection = (JarURLConnection)resource.openConnection();
+				JarURLConnection jarURLConnection = (JarURLConnection) resource.openConnection();
 				try (JarFile jarFile = jarURLConnection.getJarFile()) {
 					Enumeration<JarEntry> entries = jarFile.entries();
 					while (entries.hasMoreElements()) {
