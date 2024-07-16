@@ -1,10 +1,5 @@
 package codesquad.handler;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import codesquad.annotation.LoginCheck;
 import codesquad.annotation.RequestMapping;
 import codesquad.data.User;
@@ -18,8 +13,14 @@ import codesquad.domain.HttpResponse;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
 import codesquad.utils.UserThreadLocal;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class UserHandler {
+
+	public static final UserDatabase userDatabase = UserDatabase.getInstance();
 
 	private UserHandler() {
 	}
@@ -27,8 +28,6 @@ public class UserHandler {
 	@RequestMapping(httpMethod = HttpMethod.POST, url = "/login")
 	public void login(HttpRequest request, HttpResponse response) {
 		Map<String, String> form = request.body().bodyToMap();
-		UserDatabase userDatabase = UserDatabase.getInstance();
-
 		String userId = form.get("userId");
 		String password = form.get("password");
 		User user = userDatabase.get(userId);
@@ -56,9 +55,11 @@ public class UserHandler {
 	@RequestMapping(httpMethod = HttpMethod.POST, url = "/create")
 	public void signup(HttpRequest request, HttpResponse response) {
 		User user = getUser(request);
-		UserDatabase userDatabase = UserDatabase.getInstance();
+		User find = userDatabase.get(user.userId());
+		if (find != null) {
+			throw new BaseException(HttpStatus.CONFLICT, "already user exists");
+		}
 		userDatabase.insert(user.userId(), user);
-
 		setResponse(response);
 	}
 
