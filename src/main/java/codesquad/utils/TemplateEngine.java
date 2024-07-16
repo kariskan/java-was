@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,8 +19,6 @@ public class TemplateEngine {
 	private static final Pattern OBJECT_VARIABLE_PATTERN = Pattern.compile("\\{\\{\\s*(\\w+)\\.(\\w+)\\s*\\}\\}");
 	private static final Pattern IF_ELSE_PATTERN = Pattern.compile(
 		"\\{%\\s*if\\s+(\\w+)\\s*%\\}(.*?)\\{%\\s*else\\s*%\\}(.*?)\\{%\\s*endif\\s*%\\}", Pattern.DOTALL);
-	private static final Pattern IF_PATTERN = Pattern.compile("\\{%\\s*if\\s+(\\w+)\\s*%\\}(.*?)\\{%\\s*endif\\s*%\\}",
-		Pattern.DOTALL);
 	private static final Pattern FOR_EACH_PATTERN = Pattern.compile(
 		"\\{%\\s*for\\s+(\\w+)\\s+in\\s+(\\w+)\\s*%\\}(.*?)\\{%\\s*endfor\\s*%\\}", Pattern.DOTALL);
 	private static final Pattern INCLUDE_PATTERN = Pattern.compile("\\{%\\s*include\\s+\"([^\"]+)\"\\s*%\\}");
@@ -66,7 +67,7 @@ public class TemplateEngine {
 		StringBuilder sb = new StringBuilder();
 		while (matcher.find()) {
 			String variableName = matcher.group(1);
-			Object value = context.get(variableName);
+			Object value = URLDecoder.decode(String.valueOf(context.get(variableName)), StandardCharsets.UTF_8);
 			matcher.appendReplacement(sb, value != null ? Matcher.quoteReplacement(value.toString()) : "");
 		}
 		matcher.appendTail(sb);
@@ -84,7 +85,7 @@ public class TemplateEngine {
 				try {
 					Field field = object.getClass().getDeclaredField(propertyName);
 					field.setAccessible(true);
-					Object value = field.get(object);
+					Object value = URLDecoder.decode(String.valueOf(field.get(object)), StandardCharsets.UTF_8);
 					matcher.appendReplacement(sb, value != null ? Matcher.quoteReplacement(value.toString()) : "");
 				} catch (NoSuchFieldException | IllegalAccessException e) {
 					matcher.appendReplacement(sb, "");
@@ -129,7 +130,7 @@ public class TemplateEngine {
 			if (listObject instanceof Iterable<?> list) {
 				StringBuilder repeatedContent = new StringBuilder();
 				for (Object item : list) {
-					Map<String, Object> itemContext = new java.util.HashMap<>(context);
+					Map<String, Object> itemContext = new HashMap<>(context);
 					itemContext.put(variableName, item);
 					String renderedContent = renderObjectVariables(content, itemContext); // 객체의 속성 렌더링
 					repeatedContent.append(render(renderedContent, itemContext));
