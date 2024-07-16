@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="../reset.css" rel="stylesheet"/>
+    <link href="../global.css" rel="stylesheet"/>
+    <link href="../main.css" rel="stylesheet"/>
+    <style>
+        .post__title {
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #007BFF;
+            text-align: center; /* 중앙 정렬을 위해 추가 */
+        }
+
+        .post__title:hover {
+            text-decoration: underline;
+        }
+
+        .comment__item__reply {
+            margin-left: 20px; /* 답글 들여쓰기 */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    {% if isLogin %}
+    <header class="header">
+        <a href="/index.html"><img src="../img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <span class="btn_size_s">{{nickname}} 님 반갑습니다!</span>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/write">글쓰기</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/user/list">유저 목록</a>
+            </li>
+            <li class="header__menu__item">
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn btn_size_s">로그아웃</button>
+                </form>
+            </li>
+        </ul>
+    </header>
+    {% else %}
+    <header class="header">
+        <a href="/index.html"><img src="../img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/user/login.html">로그인</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn btn_size_s" href="/user/list">유저 목록</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/register.html">회원 가입</a>
+            </li>
+        </ul>
+    </header>
+    {% endif %}
+    <div class="wrapper">
+        <div class="post">
+            <div class="post__account">
+                <img class="post__account__img"/>
+                <p class="post__article">{{ post_nickname }}</p>
+            </div>
+            <h1 class="post__title">{{ title }}</h1> <!-- 제목 요소 추가 -->
+            <img class="post__img"/>
+            <div class="post__menu">
+                <ul class="post__menu__personal">
+                    <li>
+                        <button class="post__menu__btn">
+                            <img src="../img/like.svg"/>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="post__menu__btn">
+                            <img src="../img/sendLink.svg"/>
+                        </button>
+                    </li>
+                </ul>
+                <button class="post__menu__btn">
+                    <img src="../img/bookMark.svg"/>
+                </button>
+            </div>
+            <p class="post__article">
+                {{ content }}
+            </p>
+        </div>
+        <ul class="comment">
+            {% for comment in comments %}
+            <li class="comment__item">
+                <div class="comment__item__user">
+                    <img class="comment__item__user__img"/>
+                    <p class="comment__item__user__nickname">{{ comment.nickname }}</p>
+                </div>
+                <p class="comment__item__article">{{ comment.detail }}</p>
+                <button class="reply_button" onclick="showReplyForm('{{ comment.id }}')">답글</button>
+                <form action="/reply" method="POST" id="reply_form_{{ comment.id }}" style="display:none;">
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}"/>
+                    <label>
+                        <textarea name="content"></textarea>
+                    </label>
+                    <button type="submit">댓글 작성</button>
+                </form>
+                {% if comment.replies %}
+                <ul class="comment__item__reply">
+                    {% for reply in comment.replies %}
+                    {% include "comment.html" with comment=reply %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <nav class="nav">
+            <ul class="nav__menu">
+                <li class="nav__menu__item">
+                    <a class="btn btn_ghost btn_size_m" href="/comment.html">댓글 작성</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <script>
+        function showReplyForm(commentId) {
+            var form = document.getElementById('reply_form_' + commentId);
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+    </script>
+</div>
+</body>
+</html>
