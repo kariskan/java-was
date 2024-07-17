@@ -26,7 +26,7 @@ public class UserDatabase implements Database<String, User> {
 	}
 
 	@Override
-	public void insert(String id, User user) {
+	public Long insert(String id, User user) {
 		String insert = """
 			insert into USERS(userid, nickname, password, email)
 			values (?, ?, ?, ?)
@@ -34,7 +34,7 @@ public class UserDatabase implements Database<String, User> {
 		List<Pair<SQLType, Object>> params = List.of(of(JDBCType.VARCHAR, user.userId()),
 			of(JDBCType.VARCHAR, user.nickname()), of(JDBCType.VARCHAR, user.password()),
 			of(JDBCType.VARCHAR, user.email()));
-		JdbcTemplate.update(insert, params);
+		return JdbcTemplate.update(insert, params);
 	}
 
 	@Override
@@ -42,11 +42,7 @@ public class UserDatabase implements Database<String, User> {
 		String findById = """
 			select * from USERS where userid = ?
 			""";
-		User find = JdbcTemplate.executeOne(findById, User.class, List.of(of(JDBCType.VARCHAR, id)));
-		if (find == null) {
-			throw new BaseException(HttpStatus.NOT_FOUND, "user not found");
-		}
-		return find;
+		return JdbcTemplate.executeOne(findById, User.class, List.of(of(JDBCType.VARCHAR, id)));
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Database<T, E> {
 
-	void insert(T id, E t);
+	Long insert(T id, E t);
 
 	E get(T id);
 

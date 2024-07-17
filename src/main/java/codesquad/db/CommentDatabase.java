@@ -23,14 +23,14 @@ public class CommentDatabase implements Database<Long, Comment> {
 	}
 
 	@Override
-	public void insert(Long id, Comment t) {
+	public Long insert(Long id, Comment t) {
 		String insert = """
 			INSERT INTO comment (detail, createdAt, parentId, userId)
 			VALUES (?, ?, ?, ?);
 			""";
 		List<Pair<SQLType, Object>> list = List.of(of(VARCHAR, t.getDetail()), of(TIMESTAMP, t.getCreatedAt()),
 			of(BIGINT, t.getParentId()), of(VARCHAR, t.getUserId()));
-		JdbcTemplate.update(insert, list);
+		return JdbcTemplate.update(insert, list);
 	}
 
 	@Override

@@ -1,13 +1,14 @@
 package codesquad.db;
 
 import static codesquad.utils.Pair.of;
+import static java.sql.JDBCType.BIGINT;
+import static java.sql.JDBCType.VARCHAR;
 
 import codesquad.data.Post;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
 import codesquad.utils.JdbcTemplate;
 import codesquad.utils.Pair;
-import java.sql.JDBCType;
 import java.sql.SQLType;
 import java.util.List;
 
@@ -23,14 +24,14 @@ public class PostDatabase implements Database<Long, Post> {
 	}
 
 	@Override
-	public void insert(Long id, Post t) {
+	public Long insert(Long id, Post t) {
 		String insert = """
-			insert into POST(title, content, userId)
-			values (?, ?, ?)
+			insert into POST(title, content, userId, uploadFileId)
+			values (?, ?, ?, ?)
 			""";
-		List<Pair<SQLType, Object>> list = List.of(of(JDBCType.VARCHAR, t.title()),
-			of(JDBCType.VARCHAR, t.content()), of(JDBCType.VARCHAR, t.userId()));
-		JdbcTemplate.update(insert, list);
+		List<Pair<SQLType, Object>> list = List.of(of(VARCHAR, t.title()), of(VARCHAR, t.content()),
+			of(VARCHAR, t.userId()), of(BIGINT, t.uploadFileId()));
+		return JdbcTemplate.update(insert, list);
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class PostDatabase implements Database<Long, Post> {
 			from post
 			where id = ?
 			""";
-		Post post = JdbcTemplate.executeOne(find, Post.class, List.of(of(JDBCType.BIGINT, id)));
+		Post post = JdbcTemplate.executeOne(find, Post.class, List.of(of(BIGINT, id)));
 		if (post == null) {
 			throw new BaseException(HttpStatus.NOT_FOUND, "post not found");
 		}

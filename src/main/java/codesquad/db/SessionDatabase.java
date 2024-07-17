@@ -19,11 +19,12 @@ public class SessionDatabase implements Database<String, String> {
 	}
 
 	@Override
-	public void insert(String sessionId, String id) {
+	public Long insert(String sessionId, String id) {
 		if (sessions.containsValue(sessionId)) {
 			sessions.remove(sessionId);
 		}
 		sessions.put(sessionId, id);
+		return null;
 	}
 
 	@Override
