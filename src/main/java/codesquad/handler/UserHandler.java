@@ -47,7 +47,7 @@ public class UserHandler {
 			throw new BaseException(HttpStatus.BAD_REQUEST, "You are not logged in");
 		}
 		Cookie sid = request.getCookie("SID");
-		SessionDatabase.getInstance().delete(sid.getValue());
+		SessionDatabase.getInstance().delete(sid.value());
 		removeCookie(response);
 		response.sendRedirect("/index.html");
 	}

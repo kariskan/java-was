@@ -20,7 +20,7 @@ public class ThreadLocalFilter {
 	private static User getUserByCookie(HttpRequest request) {
 		Cookie cookie = request.getCookie("SID");
 		if (cookie != null) {
-			String userId = SessionDatabase.getInstance().get(cookie.getValue());
+			String userId = SessionDatabase.getInstance().get(cookie.value());
 			if (userId == null) {
 				return null;
 			}

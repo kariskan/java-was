@@ -36,7 +36,7 @@ public record HttpRequest(
 			return null;
 		}
 		return Arrays.stream(cookies)
-			.filter(cookie -> cookie.getName().equals(name))
+			.filter(cookie -> cookie.name().equals(name))
 			.findFirst()
 			.orElse(null);
 	}
