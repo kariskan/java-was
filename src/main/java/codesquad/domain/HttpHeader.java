@@ -47,6 +47,6 @@ public class HttpHeader {
 	public String toString() {
 		return headers.entrySet().stream()
 				   .map(e -> e.getKey() + ": " + String.join("; ", e.getValue()))
-				   .collect(Collectors.joining(lineSeparator())) + lineSeparator() + lineSeparator();
+				   .collect(Collectors.joining(lineSeparator())) + doubleLineSeparator();
 	}
 }

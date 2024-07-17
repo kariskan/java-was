@@ -1,5 +1,7 @@
 package codesquad.domain;
 
+import static codesquad.utils.StringUtils.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import codesquad.data.UploadFile;
 import codesquad.error.BaseException;
+import codesquad.utils.StringUtils;
 
 public record HttpBody(byte[] body) {
 
@@ -49,8 +52,8 @@ public record HttpBody(byte[] body) {
 			if (nextStart == -1)
 				break;
 
-			int partStart = end + boundaryBytes.length + 2; // Skip boundary and \r\n
-			int partEnd = nextStart - 2; // Exclude the \r\n before the next boundary
+			int partStart = end + boundaryBytes.length + 2;
+			int partEnd = nextStart - 2;
 
 			byte[] part = new byte[partEnd - partStart];
 			System.arraycopy(body, partStart, part, 0, part.length);
@@ -62,7 +65,6 @@ public record HttpBody(byte[] body) {
 				throw BaseException.serverException(e);
 			}
 
-			start = nextStart;
 			end = nextStart;
 		}
 
@@ -70,14 +72,14 @@ public record HttpBody(byte[] body) {
 	}
 
 	private void parsePart(byte[] part, Map<String, Object> multipartData) throws UnsupportedEncodingException {
-		int headerEnd = indexOf(part, "\r\n\r\n".getBytes("UTF-8"), 0);
+		int headerEnd = indexOf(part, doubleLineSeparator().getBytes("UTF-8"), 0);
 		if (headerEnd == -1)
 			return;
 
 		byte[] headerBytes = new byte[headerEnd];
 		System.arraycopy(part, 0, headerBytes, 0, headerBytes.length);
 		String headerString = new String(headerBytes, "UTF-8");
-		String[] headers = headerString.split("\r\n");
+		String[] headers = headerString.split(lineSeparator());
 
 		String contentDisposition = null;
 		for (String header : headers) {
@@ -103,7 +105,7 @@ public record HttpBody(byte[] body) {
 			}
 		}
 
-		int dataStart = headerEnd + 4; // Skip the \r\n\r\n
+		int dataStart = headerEnd + 4;
 		byte[] dataBytes = new byte[part.length - dataStart];
 		System.arraycopy(part, dataStart, dataBytes, 0, dataBytes.length);
 

@@ -83,8 +83,7 @@ public class HttpRequestUtil {
 				break;
 			}
 		}
-		String doubleLineSeparator = lineSeparator() + lineSeparator();
-		return new String(bytes, 0, idx).split(doubleLineSeparator);
+		return new String(bytes, 0, idx).split(doubleLineSeparator());
 	}
 
 	private static boolean checkHeaderEnd(int idx, byte[] bytes) {
