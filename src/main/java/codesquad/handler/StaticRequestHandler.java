@@ -3,9 +3,11 @@ package codesquad.handler;
 import codesquad.annotation.PathVariable;
 import codesquad.annotation.RequestMapping;
 import codesquad.data.Post;
+import codesquad.data.UploadFile;
 import codesquad.data.User;
 import codesquad.db.CommentDatabase;
 import codesquad.db.PostDatabase;
+import codesquad.db.UploadFileDatabase;
 import codesquad.db.UserDatabase;
 import codesquad.domain.ContentType;
 import codesquad.domain.HttpHeader;
@@ -30,6 +32,7 @@ public class StaticRequestHandler {
 	private static final UserDatabase userDatabase = UserDatabase.getInstance();
 	private static final PostDatabase postDatabase = PostDatabase.getInstance();
 	private static final CommentDatabase commentDatabase = CommentDatabase.getInstance();
+	private static final UploadFileDatabase uploadFileDatabase = UploadFileDatabase.getInstance();
 	private final Logger log = LoggerFactory.getLogger(StaticRequestHandler.class);
 
 	private StaticRequestHandler() {
@@ -55,12 +58,14 @@ public class StaticRequestHandler {
 		byte[] body = readBytesFromFile("/post.html");
 		Map<String, Object> context = new HashMap<>();
 		Post post = postDatabase.get(postId);
+		UploadFile uploadFile = uploadFileDatabase.get(post.uploadFileId());
 		User user = userDatabase.get(post.userId());
 
 		context.put("post_nickname", user.nickname());
 		context.put("title", post.title());
 		context.put("content", post.content());
-		context.put("comments", commentDatabase.findAll());
+//		context.put("comments", commentDatabase.findAll());
+		context.put("post_img", uploadFile);
 		body = TemplateEngine.render(new String(body), context).getBytes();
 		setResponse(response, makeHttpHeader(request), body);
 	}

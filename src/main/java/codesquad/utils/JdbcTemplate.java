@@ -1,20 +1,24 @@
 package codesquad.utils;
 
-import codesquad.domain.HttpStatus;
-import codesquad.error.BaseException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import codesquad.domain.HttpStatus;
+import codesquad.error.BaseException;
 
 public class JdbcTemplate {
 
@@ -27,12 +31,17 @@ public class JdbcTemplate {
 	private JdbcTemplate() {
 	}
 
-	public static int update(String sql, List<Pair<SQLType, Object>> params) {
+	public static long update(String sql, List<Pair<SQLType, Object>> params) {
 		try (
 			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			PreparedStatement ps = getPreparedStatement(conn, sql, params)
 		) {
-			return ps.executeUpdate();
+			ps.executeUpdate();
+			ResultSet generatedKeys = ps.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				return generatedKeys.getLong(1);
+			}
+			return 0;
 		} catch (SQLException e) {
 			log.error(e.getMessage(), e);
 			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
@@ -50,7 +59,7 @@ public class JdbcTemplate {
 				Constructor<?> constructor = getConstructor(clazz);
 				Object[] parameters = getClassParameters(clazz, rs);
 				Object o = constructor.newInstance(parameters);
-				result.add((T) o);
+				result.add((T)o);
 			}
 		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 			log.error(e.getMessage(), e);
@@ -70,7 +79,7 @@ public class JdbcTemplate {
 				Constructor<?> constructor = getConstructor(clazz);
 				Object[] parameters = getClassParameters(clazz, rs);
 				Object o = constructor.newInstance(parameters);
-				result.add((T) o);
+				result.add((T)o);
 			}
 		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 			log.error(e.getMessage(), e);
@@ -89,7 +98,11 @@ public class JdbcTemplate {
 			fields[i].setAccessible(true);
 			String fieldName = fields[i].getName();
 			Object value = rs.getObject(fieldName);
-			parameters[i] = value;
+			if (value instanceof Blob blob) {
+				parameters[i] = blob.getBytes(1L, (int) blob.length());
+			} else {
+				parameters[i] = value;
+			}
 		}
 		return parameters;
 	}
@@ -110,8 +123,8 @@ public class JdbcTemplate {
 	}
 
 	public static PreparedStatement getPreparedStatement(Connection conn, String sql,
-														 List<Pair<SQLType, Object>> params) throws SQLException {
-		PreparedStatement ps = conn.prepareStatement(sql);
+		List<Pair<SQLType, Object>> params) throws SQLException {
+		PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		if (params == null) {
 			return ps;
 		}
