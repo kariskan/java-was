@@ -28,8 +28,8 @@ public class CommentDatabase implements Database<Long, Comment> {
 			INSERT INTO comment (detail, createdAt, parentId, userId)
 			VALUES (?, ?, ?, ?);
 			""";
-		List<Pair<SQLType, Object>> list = List.of(of(VARCHAR, t.getDetail()), of(TIMESTAMP, t.getCreatedAt()),
-			of(BIGINT, t.getParentId()), of(VARCHAR, t.getUserId()));
+		List<Pair<SQLType, Object>> list = List.of(of(VARCHAR, t.detail()), of(TIMESTAMP, t.createdAt()),
+			of(BIGINT, t.parentId()), of(VARCHAR, t.userId()));
 		return JdbcTemplate.update(insert, list);
 	}
 
