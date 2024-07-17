@@ -20,7 +20,7 @@
         }
 
         .comment__item__reply {
-            margin-left: 20px; /* 답글 들여쓰기 */
+            margin-left: 20px;
         }
     </style>
 </head>
@@ -65,11 +65,11 @@
     <div class="wrapper">
         <div class="post">
             <div class="post__account">
-                <img class="post__account__img"/>
+                <img class="post__account__img" src="{{ post_account_img }}" alt="user image"/>
                 <p class="post__article">{{ post_nickname }}</p>
             </div>
-            <h1 class="post__title">{{ title }}</h1> <!-- 제목 요소 추가 -->
-            <img class="post__img"/>
+            <h1 class="post__title">{{ title }}</h1>
+            <img class="post__img" src="{{ post_img }}" alt="post image"/>
             <div class="post__menu">
                 <ul class="post__menu__personal">
                     <li>
@@ -95,22 +95,31 @@
             {% for comment in comments %}
             <li class="comment__item">
                 <div class="comment__item__user">
-                    <img class="comment__item__user__img"/>
+                    <img class="comment__item__user__img" src="{{ comment.user_img }}" alt="user image"/>
                     <p class="comment__item__user__nickname">{{ comment.nickname }}</p>
                 </div>
                 <p class="comment__item__article">{{ comment.detail }}</p>
                 <button class="reply_button" onclick="showReplyForm('{{ comment.id }}')">답글</button>
-                <form action="/reply" method="POST" id="reply_form_{{ comment.id }}" style="display:none;">
+                <form action="/reply" method="POST" id="reply_form_{{ comment.id }}" style="display:none;" enctype="multipart/form-data">
                     <input type="hidden" name="parent_id" value="{{ comment.id }}"/>
                     <label>
                         <textarea name="content"></textarea>
+                    </label>
+                    <label>
+                        <input type="file" name="reply_image"/>
                     </label>
                     <button type="submit">댓글 작성</button>
                 </form>
                 {% if comment.replies %}
                 <ul class="comment__item__reply">
                     {% for reply in comment.replies %}
-                    {% include "comment.html" with comment=reply %}
+                    <li class="comment__item">
+                        <div class="comment__item__user">
+                            <img class="comment__item__user__img" src="{{ reply.user_img }}" alt="user image"/>
+                            <p class="comment__item__user__nickname">{{ reply.nickname }}</p>
+                        </div>
+                        <p class="comment__item__article">{{ reply.detail }}</p>
+                    </li>
                     {% endfor %}
                 </ul>
                 {% endif %}
