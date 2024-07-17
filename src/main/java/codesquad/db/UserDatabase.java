@@ -1,17 +1,14 @@
 package codesquad.db;
 
-import static codesquad.utils.Pair.of;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import codesquad.data.User;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
 import codesquad.utils.JdbcTemplate;
-import codesquad.utils.Pair;
-import java.sql.JDBCType;
-import java.sql.SQLType;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class UserDatabase implements Database<String, User> {
 
@@ -31,10 +28,12 @@ public class UserDatabase implements Database<String, User> {
 			insert into USERS(userid, nickname, password, email)
 			values (?, ?, ?, ?)
 			""";
-		List<Pair<SQLType, Object>> params = List.of(of(JDBCType.VARCHAR, user.userId()),
-			of(JDBCType.VARCHAR, user.nickname()), of(JDBCType.VARCHAR, user.password()),
-			of(JDBCType.VARCHAR, user.email()));
-		return JdbcTemplate.update(insert, params);
+		return JdbcTemplate.update(insert, ps -> {
+			ps.setString(1, user.userId());
+			ps.setString(2, user.nickname());
+			ps.setString(3, user.password());
+			ps.setString(4, user.email());
+		});
 	}
 
 	@Override
@@ -42,7 +41,13 @@ public class UserDatabase implements Database<String, User> {
 		String findById = """
 			select * from USERS where userid = ?
 			""";
-		return JdbcTemplate.executeOne(findById, User.class, List.of(of(JDBCType.VARCHAR, id)));
+		return JdbcTemplate.executeOne(findById, User.class, ps -> {
+			try {
+				ps.setString(1, id);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	@Override

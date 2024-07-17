@@ -1,13 +1,9 @@
 package codesquad.db;
 
-import static codesquad.utils.Pair.of;
-import static java.sql.JDBCType.BIGINT;
-import static java.sql.JDBCType.BINARY;
-import static java.sql.JDBCType.VARCHAR;
+import java.util.List;
 
 import codesquad.data.UploadFile;
 import codesquad.utils.JdbcTemplate;
-import java.util.List;
 
 public class UploadFileDatabase implements Database<Long, UploadFile> {
 
@@ -26,7 +22,10 @@ public class UploadFileDatabase implements Database<Long, UploadFile> {
 			insert into UPLOADFILE (FILENAME, DATA)
 			values (?, ?)
 			""";
-		return JdbcTemplate.update(insert, List.of(of(VARCHAR, t.filename()), of(BINARY, t.data())));
+		return JdbcTemplate.update(insert, ps -> {
+			ps.setString(1, t.filename());
+			ps.setBytes(2, t.data());
+		});
 	}
 
 	@Override
@@ -36,7 +35,7 @@ public class UploadFileDatabase implements Database<Long, UploadFile> {
 			from UPLOADFILE
 			where ID = ?
 			""";
-		return JdbcTemplate.executeOne(find, UploadFile.class, List.of(of(BIGINT, id)));
+		return JdbcTemplate.executeOne(find, UploadFile.class, ps -> ps.setLong(1, id));
 	}
 
 	@Override

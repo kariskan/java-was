@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,6 @@ import codesquad.error.BaseException;
 
 public class JdbcTemplate {
 
-	public static final String H2_DRIVER = "org.h2.Driver";
 	public static final String DB_URL = "jdbc:h2:tcp://localhost/~/codestagram";
 	public static final String USER = "sa";
 	public static final String PASS = "";
@@ -31,64 +29,73 @@ public class JdbcTemplate {
 	private JdbcTemplate() {
 	}
 
-	public static long update(String sql, List<Pair<SQLType, Object>> params) {
-		try (
-			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			PreparedStatement ps = getPreparedStatement(conn, sql, params)
-		) {
+	public static long update(String sql, QuerySetter qs) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+			if (qs != null) {
+				qs.setValues(ps);
+			}
 			ps.executeUpdate();
-			ResultSet generatedKeys = ps.getGeneratedKeys();
-			if (generatedKeys.next()) {
-				return generatedKeys.getLong(1);
+			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					return generatedKeys.getLong(1);
+				}
 			}
 			return 0;
 		} catch (SQLException e) {
-			log.error(e.getMessage(), e);
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+			log.error(e.getMessage());
+			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
 		}
 	}
 
-	public static <T> List<T> execute(String sql, Class<T> clazz, List<Pair<SQLType, Object>> params) {
+	public static <T> List<T> execute(String sql, Class<T> clazz, QuerySetter qs) {
 		List<T> result = new ArrayList<>();
-		try (
-			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			PreparedStatement ps = getPreparedStatement(conn, sql, params);
-			ResultSet rs = ps.executeQuery()
-		) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			 PreparedStatement ps = getPreparedStatement(conn, sql, qs);
+			 ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
-				Constructor<?> constructor = getConstructor(clazz);
-				Object[] parameters = getClassParameters(clazz, rs);
-				Object o = constructor.newInstance(parameters);
-				result.add((T)o);
+				result.add(createInstanceFromResultSet(clazz, rs));
 			}
-		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-			log.error(e.getMessage(), e);
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+		} catch (SQLException e) {
+			log.error("Query execution error: {}", sql, e);
+			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
 		}
 		return result;
 	}
 
-	public static <T> T executeOne(String sql, Class<T> clazz, List<Pair<SQLType, Object>> params) {
-		List<T> result = new ArrayList<>();
-		try (
-			Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			PreparedStatement ps = getPreparedStatement(conn, sql, params);
-			ResultSet rs = ps.executeQuery()
-		) {
-			while (rs.next()) {
-				Constructor<?> constructor = getConstructor(clazz);
-				Object[] parameters = getClassParameters(clazz, rs);
-				Object o = constructor.newInstance(parameters);
-				result.add((T)o);
+	public static <T> T executeOne(String sql, Class<T> clazz, QuerySetter qs) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			 PreparedStatement ps = getPreparedStatement(conn, sql, qs);
+			 ResultSet rs = ps.executeQuery()) {
+			if (rs.next()) {
+				return createInstanceFromResultSet(clazz, rs);
 			}
-		} catch (SQLException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-			log.error(e.getMessage(), e);
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
 		}
-		if (result.isEmpty()) {
-			return null;
+		return null;
+	}
+
+	private static PreparedStatement getPreparedStatement(Connection conn, String sql, QuerySetter qs) throws
+		SQLException {
+		PreparedStatement ps = conn.prepareStatement(sql);
+		if (qs != null) {
+			qs.setValues(ps);
 		}
-		return result.get(0);
+		return ps;
+	}
+
+	private static <T> T createInstanceFromResultSet(Class<T> clazz, ResultSet rs)  {
+		Constructor<?> constructor = getConstructor(clazz);
+		Object[] parameters;
+		try {
+			parameters = getClassParameters(clazz, rs);
+			return (T)constructor.newInstance(parameters);
+		} catch (SQLException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+			log.error(e.getMessage());
+			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+		}
 	}
 
 	private static <T> Object[] getClassParameters(Class<T> clazz, ResultSet rs) throws SQLException {
@@ -99,7 +106,7 @@ public class JdbcTemplate {
 			String fieldName = fields[i].getName();
 			Object value = rs.getObject(fieldName);
 			if (value instanceof Blob blob) {
-				parameters[i] = blob.getBytes(1L, (int) blob.length());
+				parameters[i] = blob.getBytes(1L, (int)blob.length());
 			} else {
 				parameters[i] = value;
 			}
@@ -108,32 +115,12 @@ public class JdbcTemplate {
 	}
 
 	private static <T> Constructor<?> getConstructor(Class<T> clazz) {
-		Constructor<?> constructor = null;
-		Constructor<?>[] constructors = clazz.getConstructors();
-		for (Constructor<?> ctor : constructors) {
+		for (Constructor<?> ctor : clazz.getConstructors()) {
 			if (ctor.getParameterCount() == clazz.getDeclaredFields().length) {
-				constructor = ctor;
-				break;
+				ctor.setAccessible(true);
+				return ctor;
 			}
 		}
-		if (constructor != null) {
-			constructor.setAccessible(true);
-		}
-		return constructor;
-	}
-
-	public static PreparedStatement getPreparedStatement(Connection conn, String sql,
-		List<Pair<SQLType, Object>> params) throws SQLException {
-		PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-		if (params == null) {
-			return ps;
-		}
-		int idx = 1;
-		for (Pair<SQLType, Object> pair : params) {
-			SQLType sqlType = pair.getLeft();
-			Object value = pair.getRight();
-			ps.setObject(idx++, value, sqlType);
-		}
-		return ps;
+		throw new IllegalArgumentException("No suitable constructor found for class " + clazz.getName());
 	}
 }
