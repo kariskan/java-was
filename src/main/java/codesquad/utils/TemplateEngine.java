@@ -77,8 +77,9 @@ public class TemplateEngine {
 			Object value = context.get(variableName);
 			if (value != null) {
 				if (value instanceof UploadFile file) {
-					value = "data:" + ContentType.from(file.getExtension()) + ";base64," + Base64.getEncoder()
-						.encodeToString(file.data());
+					value =
+						"data:" + ContentType.from(file.getExtension()).getMimeType() + ";base64," + Base64.getEncoder()
+							.encodeToString(file.data());
 				} else {
 					try {
 						value = URLDecoder.decode(value.toString(), "UTF-8");
@@ -108,8 +109,8 @@ public class TemplateEngine {
 					Object value = field.get(object);
 					if (value != null) {
 						if (value instanceof UploadFile file) {
-							value = "data:" + ContentType.from(file.getExtension()) + ";base64," + Base64.getEncoder()
-								.encodeToString(file.data());
+							value = "data:" + ContentType.from(file.getExtension()).getMimeType() + ";base64,"
+									+ Base64.getEncoder().encodeToString(file.data());
 						} else {
 							try {
 								value = URLDecoder.decode(value.toString(), "UTF-8");
