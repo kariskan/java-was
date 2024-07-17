@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import codesquad.data.UploadFile;
+import codesquad.domain.ContentType;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
 
@@ -76,7 +77,8 @@ public class TemplateEngine {
 			Object value = context.get(variableName);
 			if (value != null) {
 				if (value instanceof UploadFile file) {
-					value = "data:" + file.getMimeType() + ";base64," + Base64.getEncoder().encodeToString(file.data());
+					value = "data:" + ContentType.from(file.getExtension()) + ";base64," + Base64.getEncoder()
+						.encodeToString(file.data());
 				} else {
 					try {
 						value = URLDecoder.decode(value.toString(), "UTF-8");
@@ -106,7 +108,7 @@ public class TemplateEngine {
 					Object value = field.get(object);
 					if (value != null) {
 						if (value instanceof UploadFile file) {
-							value = "data:" + file.getMimeType() + ";base64," + Base64.getEncoder()
+							value = "data:" + ContentType.from(file.getExtension()) + ";base64," + Base64.getEncoder()
 								.encodeToString(file.data());
 						} else {
 							try {

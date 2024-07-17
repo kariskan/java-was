@@ -6,15 +6,7 @@ public record UploadFile(
 	byte[] data
 ) {
 
-	public String getMimeType() {
-		String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
-		return switch (extension) {
-			case "png" -> "image/png";
-			case "gif" -> "image/gif";
-			case "jpg", "jpeg" -> "image/jpeg";
-			case "bmp" -> "image/bmp";
-			case "webp" -> "image/webp";
-			default -> "application/octet-stream";
-		};
+	public String getExtension() {
+		return filename.substring(filename.lastIndexOf('.')).toLowerCase();
 	}
 }

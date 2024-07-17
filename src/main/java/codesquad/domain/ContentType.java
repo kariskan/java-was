@@ -10,7 +10,12 @@ public enum ContentType {
 	ICO("image/x-icon", ".ico"),
 	PNG("image/png", ".png"),
 	JPG("image/jpeg", ".jpeg"),
-	SVG("image/svg+xml", ".svg");
+	SVG("image/svg+xml", ".svg"),
+	GIF("image/gif", ".gif"),
+	BMP("image/bmp", ".bmp"),
+	WEBP("image/webp", ".webp"),
+	PDF("application/pdf", ".pdf"),
+	OCTET("application/octet-stream", ".octet");
 
 	private final String mimeType;
 	private final String extension;
