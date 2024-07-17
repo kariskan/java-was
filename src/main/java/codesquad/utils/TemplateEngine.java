@@ -62,7 +62,7 @@ public class TemplateEngine {
 	private static String readFile(String filePath) throws IOException {
 		URL resource = TemplateEngine.class.getClassLoader().getResource(filePath);
 		if (resource == null) {
-			throw new IOException("Resource not found: " + filePath);
+			throw new BaseException(HttpStatus.NOT_FOUND, "resource not found");
 		}
 		try (InputStream inputStream = resource.openStream()) {
 			return new String(inputStream.readAllBytes());
@@ -84,7 +84,7 @@ public class TemplateEngine {
 						value = URLDecoder.decode(value.toString(), "UTF-8");
 					} catch (IllegalArgumentException | UnsupportedEncodingException e) {
 						log.error(e.getMessage());
-						throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+						throw BaseException.serverException(e);
 					}
 				}
 			}

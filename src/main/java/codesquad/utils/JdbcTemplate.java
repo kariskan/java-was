@@ -44,7 +44,7 @@ public class JdbcTemplate {
 			return 0;
 		} catch (SQLException e) {
 			log.error(e.getMessage());
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
+			throw BaseException.serverException(e);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class JdbcTemplate {
 			}
 		} catch (SQLException e) {
 			log.error("Query execution error: {}", sql, e);
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
+			throw BaseException.serverException(e);
 		}
 		return result;
 	}
@@ -72,7 +72,7 @@ public class JdbcTemplate {
 			}
 		} catch (SQLException e) {
 			log.error(e.getMessage());
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error: " + e.getMessage());
+			throw BaseException.serverException(e);
 		}
 		return null;
 	}
@@ -94,7 +94,7 @@ public class JdbcTemplate {
 			return (T)constructor.newInstance(parameters);
 		} catch (SQLException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			log.error(e.getMessage());
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+			throw BaseException.serverException(e);
 		}
 	}
 
@@ -121,6 +121,6 @@ public class JdbcTemplate {
 				return ctor;
 			}
 		}
-		throw new IllegalArgumentException("No suitable constructor found for class " + clazz.getName());
+		throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
 	}
 }

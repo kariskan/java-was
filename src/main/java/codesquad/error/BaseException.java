@@ -1,8 +1,13 @@
 package codesquad.error;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import codesquad.domain.HttpStatus;
 
 public class BaseException extends RuntimeException {
+
+	private static final Logger log = LoggerFactory.getLogger(BaseException.class);
 
 	private final HttpStatus status;
 	private final String message;
@@ -10,6 +15,11 @@ public class BaseException extends RuntimeException {
 	public BaseException(HttpStatus status, String message) {
 		this.status = status;
 		this.message = message;
+	}
+
+	public static BaseException serverException(Exception e) {
+		log.error(e.getMessage());
+		return new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 	}
 
 	@Override

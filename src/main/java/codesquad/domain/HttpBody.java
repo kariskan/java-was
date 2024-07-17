@@ -25,7 +25,7 @@ public record HttpBody(byte[] body) {
 					return URLDecoder.decode(split[1], "UTF-8");
 				} catch (UnsupportedEncodingException e) {
 					log.error(e.getMessage());
-					throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+					throw BaseException.serverException(e);
 				}
 			}));
 	}
@@ -38,7 +38,7 @@ public record HttpBody(byte[] body) {
 			boundaryBytes = boundaryString.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			log.error(e.getMessage());
-			throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+			throw BaseException.serverException(e);
 		}
 
 		int start = 0;
@@ -59,7 +59,7 @@ public record HttpBody(byte[] body) {
 				parsePart(part, multipartData);
 			} catch (UnsupportedEncodingException e) {
 				log.error(e.getMessage());
-				throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+				throw BaseException.serverException(e);
 			}
 
 			start = nextStart;
@@ -114,7 +114,7 @@ public record HttpBody(byte[] body) {
 				multipartData.put(name, new String(dataBytes, "UTF-8").trim());
 			} catch (UnsupportedEncodingException e) {
 				log.error(e.getMessage());
-				throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error");
+				throw BaseException.serverException(e);
 			}
 		}
 	}

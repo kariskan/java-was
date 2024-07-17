@@ -45,7 +45,7 @@ public class UserDatabase implements Database<String, User> {
 			try {
 				ps.setString(1, id);
 			} catch (SQLException e) {
-				throw new RuntimeException(e);
+				throw BaseException.serverException(e);
 			}
 		});
 	}
