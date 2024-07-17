@@ -7,7 +7,7 @@ import java.util.Optional;
 import codesquad.error.BaseException;
 
 public class Parameters {
-	private Map<String, String> params;
+	private final Map<String, String> params;
 
 	public Parameters(String params) {
 		String[] split = params.split("&");

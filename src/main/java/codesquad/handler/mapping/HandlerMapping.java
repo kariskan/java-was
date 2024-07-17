@@ -1,9 +1,5 @@
 package codesquad.handler.mapping;
 
-import codesquad.annotation.RequestMapping;
-import codesquad.domain.HttpRequest;
-import codesquad.domain.HttpStatus;
-import codesquad.error.BaseException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -19,8 +15,14 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import codesquad.annotation.RequestMapping;
+import codesquad.domain.HttpRequest;
+import codesquad.domain.HttpStatus;
+import codesquad.error.BaseException;
 
 public class HandlerMapping {
 
@@ -40,26 +42,34 @@ public class HandlerMapping {
 		try {
 			List<Class<?>> classes = getClasses("codesquad.handler");
 			for (Class<?> clazz : classes) {
-				Constructor<?> constructor = clazz.getDeclaredConstructor();
-				constructor.setAccessible(true);
-				Object instance = constructor.newInstance();
+				Object instance = instantiateHandler(clazz);
 				handlerInstances.put(clazz, instance);
-				for (Method method : clazz.getDeclaredMethods()) {
-					if (method.isAnnotationPresent(RequestMapping.class)) {
-						RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-						String urlPattern = mapping.url();
-						if ("/static".equals(urlPattern)) {
-							staticResourceHandler = method;
-						} else {
-							String regex = urlPattern.replaceAll("\\{[^/]+\\}", "[^/]+");
-							Pattern pattern = Pattern.compile(mapping.httpMethod() + " " + regex);
-							handlerMethods.put(pattern, method);
-						}
-					}
-				}
+				registerHandlerMethods(clazz, instance);
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.error("Error initializing handler mapping", e);
+		}
+	}
+
+	private static Object instantiateHandler(Class<?> clazz) throws ReflectiveOperationException {
+		Constructor<?> constructor = clazz.getDeclaredConstructor();
+		constructor.setAccessible(true);
+		return constructor.newInstance();
+	}
+
+	private static void registerHandlerMethods(Class<?> clazz, Object instance) {
+		for (Method method : clazz.getDeclaredMethods()) {
+			if (method.isAnnotationPresent(RequestMapping.class)) {
+				RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+				String urlPattern = mapping.url();
+				if ("/static".equals(urlPattern)) {
+					staticResourceHandler = method;
+				} else {
+					String regex = urlPattern.replaceAll("\\{[^/]+\\}", "[^/]+");
+					Pattern pattern = Pattern.compile(mapping.httpMethod() + " " + regex);
+					handlerMethods.put(pattern, method);
+				}
+			}
 		}
 	}
 
@@ -67,9 +77,10 @@ public class HandlerMapping {
 		String key = request.getMethod() + " " + request.getUrl();
 		boolean urlMatched = false;
 
-		for (Pattern pattern : handlerMethods.keySet()) {
+		for (Map.Entry<Pattern, Method> entry : handlerMethods.entrySet()) {
+			Pattern pattern = entry.getKey();
 			if (pattern.matcher(key).matches()) {
-				return handlerMethods.get(pattern);
+				return entry.getValue();
 			}
 			if (pattern.matcher(".* " + request.getUrl()).matches()) {
 				urlMatched = true;
@@ -99,22 +110,30 @@ public class HandlerMapping {
 			URL resource = resources.nextElement();
 			String protocol = resource.getProtocol();
 			if ("jar".equals(protocol)) {
-				JarURLConnection jarURLConnection = (JarURLConnection) resource.openConnection();
-				try (JarFile jarFile = jarURLConnection.getJarFile()) {
-					Enumeration<JarEntry> entries = jarFile.entries();
-					while (entries.hasMoreElements()) {
-						JarEntry entry = entries.nextElement();
-						String entryName = entry.getName();
-						if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains("$")) {
-							String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
-							classes.add(Class.forName(className));
-						}
-					}
-				}
+				classes.addAll(getClassesFromJar(resource, path));
 			} else if ("file".equals(protocol)) {
 				File directory = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
 				if (directory.exists()) {
 					classes.addAll(findClasses(directory, packageName));
+				}
+			}
+		}
+		return classes;
+	}
+
+	private static List<Class<?>> getClassesFromJar(URL resource, String path) throws
+		IOException,
+		ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
+		JarURLConnection jarURLConnection = (JarURLConnection)resource.openConnection();
+		try (JarFile jarFile = jarURLConnection.getJarFile()) {
+			Enumeration<JarEntry> entries = jarFile.entries();
+			while (entries.hasMoreElements()) {
+				JarEntry entry = entries.nextElement();
+				String entryName = entry.getName();
+				if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains("$")) {
+					String className = entryName.replace('/', '.').substring(0, entryName.length() - 6);
+					classes.add(Class.forName(className));
 				}
 			}
 		}
