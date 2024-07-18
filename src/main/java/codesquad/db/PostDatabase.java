@@ -5,7 +5,8 @@ import java.util.List;
 import codesquad.data.Post;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
-import codesquad.utils.JdbcTemplate;
+import codesquad.utils.CsvJdbcTemplate;
+import codesquad.utils.CsvUtil;
 
 public class PostDatabase implements Database<Long, Post> {
 
@@ -21,15 +22,19 @@ public class PostDatabase implements Database<Long, Post> {
 	@Override
 	public Long insert(Long id, Post t) {
 		String insert = """
-			insert into POST(title, content, userId, uploadFileId)
-			values (?, ?, ?, ?)
+			insert into POST (id, title, content, userId, uploadFileId)
+			values (?, ?, ?, ?, ?)
 			""";
-		return JdbcTemplate.update(insert, ps -> {
-			ps.setString(1, t.title());
-			ps.setString(2, t.content());
-			ps.setString(3, t.userId());
-			ps.setLong(4, t.uploadFileId());
+		id = (long)CsvUtil.readCsv("POST").size();
+		Long finalId = id;
+		CsvJdbcTemplate.update(insert, ps -> {
+			ps.setLong(1, finalId);
+			ps.setString(2, t.title());
+			ps.setString(3, t.content());
+			ps.setString(4, t.userId());
+			ps.setLong(5, t.uploadFileId());
 		});
+		return finalId;
 	}
 
 	@Override
@@ -39,7 +44,7 @@ public class PostDatabase implements Database<Long, Post> {
 			from post
 			where id = ?
 			""";
-		Post post = JdbcTemplate.executeOne(find, Post.class, ps -> ps.setLong(1, id));
+		Post post = CsvJdbcTemplate.executeOne(find, Post.class, ps -> ps.setLong(1, id));
 		if (post == null) {
 			throw new BaseException(HttpStatus.NOT_FOUND, "post not found");
 		}
@@ -62,6 +67,6 @@ public class PostDatabase implements Database<Long, Post> {
 			select *
 			from post
 			""";
-		return JdbcTemplate.execute(find, Post.class, null);
+		return CsvJdbcTemplate.execute(find, Post.class, null);
 	}
 }

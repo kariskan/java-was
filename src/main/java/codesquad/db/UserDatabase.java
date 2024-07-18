@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import codesquad.data.User;
 import codesquad.domain.HttpStatus;
 import codesquad.error.BaseException;
-import codesquad.utils.JdbcTemplate;
+import codesquad.utils.CsvJdbcTemplate;
 
 public class UserDatabase implements Database<String, User> {
 
@@ -25,10 +25,10 @@ public class UserDatabase implements Database<String, User> {
 	@Override
 	public Long insert(String id, User user) {
 		String insert = """
-			insert into USERS(userid, nickname, password, email)
+			insert into USERS (userid, nickname, password, email)
 			values (?, ?, ?, ?)
 			""";
-		return JdbcTemplate.update(insert, ps -> {
+		return CsvJdbcTemplate.update(insert, ps -> {
 			ps.setString(1, user.userId());
 			ps.setString(2, user.nickname());
 			ps.setString(3, user.password());
@@ -41,7 +41,7 @@ public class UserDatabase implements Database<String, User> {
 		String findById = """
 			select * from USERS where userid = ?
 			""";
-		return JdbcTemplate.executeOne(findById, User.class, ps -> {
+		return CsvJdbcTemplate.executeOne(findById, User.class, ps -> {
 			try {
 				ps.setString(1, id);
 			} catch (SQLException e) {
@@ -74,6 +74,6 @@ public class UserDatabase implements Database<String, User> {
 		String select = """
 			select * from USERS
 			""";
-		return JdbcTemplate.execute(select, User.class, null);
+		return CsvJdbcTemplate.execute(select, User.class, null);
 	}
 }

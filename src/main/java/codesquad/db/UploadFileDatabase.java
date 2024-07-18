@@ -1,9 +1,11 @@
 package codesquad.db;
 
+import codesquad.utils.CsvJdbcTemplate;
+import codesquad.utils.CsvUtil;
 import java.util.List;
 
 import codesquad.data.UploadFile;
-import codesquad.utils.JdbcTemplate;
+import codesquad.utils.DbJdbcTemplate;
 
 public class UploadFileDatabase implements Database<Long, UploadFile> {
 
@@ -19,13 +21,17 @@ public class UploadFileDatabase implements Database<Long, UploadFile> {
 	@Override
 	public Long insert(Long id, UploadFile t) {
 		String insert = """
-			insert into UPLOADFILE (FILENAME, DATA)
-			values (?, ?)
+			insert into UPLOADFILE (ID, FILENAME, DATA)
+			values (?, ?, ?)
 			""";
-		return JdbcTemplate.update(insert, ps -> {
-			ps.setString(1, t.filename());
-			ps.setBytes(2, t.data());
+		id = (long) CsvUtil.readCsv("UPLOADFILE").size();
+		Long finalId = id;
+		CsvJdbcTemplate.update(insert, ps -> {
+			ps.setLong(1, finalId);
+			ps.setString(2, t.filename());
+			ps.setBytes(3, t.data());
 		});
+		return finalId;
 	}
 
 	@Override
@@ -35,7 +41,7 @@ public class UploadFileDatabase implements Database<Long, UploadFile> {
 			from UPLOADFILE
 			where ID = ?
 			""";
-		return JdbcTemplate.executeOne(find, UploadFile.class, ps -> ps.setLong(1, id));
+		return CsvJdbcTemplate.executeOne(find, UploadFile.class, ps -> ps.setLong(1, id));
 	}
 
 	@Override

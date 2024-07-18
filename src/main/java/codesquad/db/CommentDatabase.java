@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import codesquad.data.Comment;
-import codesquad.utils.JdbcTemplate;
+import codesquad.utils.CsvJdbcTemplate;
 
 public class CommentDatabase implements Database<Long, Comment> {
 
@@ -23,7 +23,7 @@ public class CommentDatabase implements Database<Long, Comment> {
 			INSERT INTO comment (detail, createdAt, parentId, userId)
 			VALUES (?, ?, ?, ?);
 			""";
-		return JdbcTemplate.update(insert, ps -> {
+		return CsvJdbcTemplate.update(insert, ps -> {
 			ps.setString(1, t.detail());
 			ps.setTimestamp(2, Timestamp.valueOf(t.createdAt()));
 			ps.setLong(3, t.parentId());
@@ -51,6 +51,6 @@ public class CommentDatabase implements Database<Long, Comment> {
 		String sql = """
 			select * from comment
 			""";
-		return JdbcTemplate.execute(sql, Comment.class, null);
+		return CsvJdbcTemplate.execute(sql, Comment.class, null);
 	}
 }
