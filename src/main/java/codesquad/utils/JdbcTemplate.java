@@ -21,7 +21,7 @@ import codesquad.error.BaseException;
 
 public class JdbcTemplate {
 
-	public static final String DB_URL = "jdbc:h2:tcp://localhost/~/codestagram";
+	public static final String DB_URL = "jdbc:h2:~/testdb";
 	public static final String USER = "sa";
 	public static final String PASS = "";
 	private static final Logger log = LoggerFactory.getLogger(JdbcTemplate.class);

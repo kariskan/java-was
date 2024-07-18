@@ -1,0 +1,9 @@
+drop table if exists COMMENT;
+drop table if exists users;
+drop table if exists post;
+drop table if exists UPLOADFILE;
+create table COMMENT(ID        BIGINT auto_increment primary key,DETAIL    CHARACTER VARYING(100),CREATEDAT TIMESTAMP,PARENTID  BIGINT,USERID    CHARACTER VARYING(100),POSTID    BIGINT);
+create table POST(ID           BIGINT auto_increment primary key,TITLE        CHARACTER VARYING(100),CONTENT      CHARACTER VARYING(500),USERID       CHARACTER VARYING(100),UPLOADFILEID BIGINT);
+create table UPLOADFILE(ID       BIGINT auto_increment primary key,FILENAME CHARACTER VARYING(100),    DATA     BINARY LARGE OBJECT);
+create table USERS(USERID   CHARACTER VARYING(100) not null primary key,NICKNAME CHARACTER VARYING(100),PASSWORD CHARACTER VARYING(100),EMAIL    CHARACTER VARYING(100));
+
