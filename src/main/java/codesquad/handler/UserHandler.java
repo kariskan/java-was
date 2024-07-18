@@ -31,6 +31,9 @@ public class UserHandler {
 		String userId = form.get("userId");
 		String password = form.get("password");
 		User user = userDatabase.get(userId);
+		if (user == null) {
+			throw new BaseException(HttpStatus.NOT_FOUND, "user not found");
+		}
 		if (!(user.userId().equals(userId) && user.password().equals(password))) {
 			throw new BaseException(HttpStatus.BAD_REQUEST, "Wrong id or password");
 		}
