@@ -91,48 +91,48 @@
                 {{ content }}
             </p>
         </div>
-        <ul class="comment">
-            {% for comment in comments %}
-            <li class="comment__item">
-                <div class="comment__item__user">
-                    <img class="comment__item__user__img" src="{{ comment.user_img }}" alt="user image"/>
-                    <p class="comment__item__user__nickname">{{ comment.nickname }}</p>
-                </div>
-                <p class="comment__item__article">{{ comment.detail }}</p>
-                <button class="reply_button" onclick="showReplyForm('{{ comment.id }}')">답글</button>
-                <form action="/reply" method="POST" id="reply_form_{{ comment.id }}" style="display:none;" enctype="multipart/form-data">
-                    <input type="hidden" name="parent_id" value="{{ comment.id }}"/>
-                    <label>
-                        <textarea name="content"></textarea>
-                    </label>
-                    <label>
-                        <input type="file" name="reply_image"/>
-                    </label>
-                    <button type="submit">댓글 작성</button>
-                </form>
-                {% if comment.replies %}
-                <ul class="comment__item__reply">
-                    {% for reply in comment.replies %}
-                    <li class="comment__item">
-                        <div class="comment__item__user">
-                            <img class="comment__item__user__img" src="{{ reply.user_img }}" alt="user image"/>
-                            <p class="comment__item__user__nickname">{{ reply.nickname }}</p>
-                        </div>
-                        <p class="comment__item__article">{{ reply.detail }}</p>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-        <nav class="nav">
-            <ul class="nav__menu">
-                <li class="nav__menu__item">
-                    <a class="btn btn_ghost btn_size_m" href="/comment.html">댓글 작성</a>
-                </li>
-            </ul>
-        </nav>
+<!--        <ul class="comment">-->
+<!--            {% for comment in comments %}-->
+<!--            <li class="comment__item">-->
+<!--                <div class="comment__item__user">-->
+<!--                    <img class="comment__item__user__img" src="{{ comment.user_img }}" alt="user image"/>-->
+<!--                    <p class="comment__item__user__nickname">{{ comment.nickname }}</p>-->
+<!--                </div>-->
+<!--                <p class="comment__item__article">{{ comment.detail }}</p>-->
+<!--                <button class="reply_button" onclick="showReplyForm('{{ comment.id }}')">답글</button>-->
+<!--                <form action="/reply" method="POST" id="reply_form_{{ comment.id }}" style="display:none;" enctype="multipart/form-data">-->
+<!--                    <input type="hidden" name="parent_id" value="{{ comment.id }}"/>-->
+<!--                    <label>-->
+<!--                        <textarea name="content"></textarea>-->
+<!--                    </label>-->
+<!--                    <label>-->
+<!--                        <input type="file" name="reply_image"/>-->
+<!--                    </label>-->
+<!--                    <button type="submit">댓글 작성</button>-->
+<!--                </form>-->
+<!--                {% if comment.replies %}-->
+<!--                <ul class="comment__item__reply">-->
+<!--                    {% for reply in comment.replies %}-->
+<!--                    <li class="comment__item">-->
+<!--                        <div class="comment__item__user">-->
+<!--                            <img class="comment__item__user__img" src="{{ reply.user_img }}" alt="user image"/>-->
+<!--                            <p class="comment__item__user__nickname">{{ reply.nickname }}</p>-->
+<!--                        </div>-->
+<!--                        <p class="comment__item__article">{{ reply.detail }}</p>-->
+<!--                    </li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+<!--                {% endif %}-->
+<!--            </li>-->
+<!--            {% endfor %}-->
+<!--        </ul>-->
+<!--        <nav class="nav">-->
+<!--            <ul class="nav__menu">-->
+<!--                <li class="nav__menu__item">-->
+<!--                    <a class="btn btn_ghost btn_size_m" href="/comment.html">댓글 작성</a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </nav>-->
     </div>
     <script>
         function showReplyForm(commentId) {
