@@ -22,6 +22,10 @@ public class BaseException extends RuntimeException {
 		return new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 	}
 
+	public static BaseException serverException() {
+		return new BaseException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
+	}
+
 	@Override
 	public synchronized Throwable fillInStackTrace() {
 		return this;
