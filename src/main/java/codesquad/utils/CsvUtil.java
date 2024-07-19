@@ -42,7 +42,7 @@ public class CsvUtil {
 	}
 
 	public static void writeCsv(String filePath, List<String[]> data) {
-		try (FileOutputStream fos = new FileOutputStream("data/" + filePath + ".csv");
+		try (FileOutputStream fos = new FileOutputStream("data/" + filePath.toLowerCase() + ".csv");
 			 OutputStreamWriter osw = new OutputStreamWriter(fos);
 			 BufferedWriter writer = new BufferedWriter(osw)) {
 			for (String[] record : data) {
@@ -68,7 +68,7 @@ public class CsvUtil {
 	}
 
 	public static void removeCsvFile(String name) {
-		File file = new File("data/" + name + ".csv");
+		File file = new File("data/" + name.toLowerCase() + ".csv");
 		if (!file.exists()) {
 			return;
 		}
