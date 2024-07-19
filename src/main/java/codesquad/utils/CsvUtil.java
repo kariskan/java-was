@@ -55,7 +55,7 @@ public class CsvUtil {
 	}
 
 	public static void generateCsvFiles(Table table) {
-		String filePath = "data/" + table.name() + ".csv";
+		String filePath = "data/" + table.name().toLowerCase() + ".csv";
 		try (FileWriter writer = new FileWriter(filePath)) {
 			StringBuilder header = new StringBuilder();
 			for (Column column : table.columns()) {
