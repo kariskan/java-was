@@ -23,7 +23,7 @@ public class CsvUtil {
 
 	public static List<String[]> readCsv(String filePath) {
 		List<String[]> records = new ArrayList<>();
-		try (FileInputStream fis = new FileInputStream("data/" + filePath + ".csv");
+		try (FileInputStream fis = new FileInputStream("data/" + filePath.toLowerCase() + ".csv");
 			 InputStreamReader isr = new InputStreamReader(fis);
 			 BufferedReader reader = new BufferedReader(isr)) {
 			String line;
