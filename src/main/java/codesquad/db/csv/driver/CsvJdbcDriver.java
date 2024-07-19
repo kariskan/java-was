@@ -10,15 +10,6 @@ import java.util.Properties;
 
 public class CsvJdbcDriver implements Driver {
 
-	static {
-		try {
-			DriverManager.registerDriver(new CsvJdbcDriver());
-
-		} catch (SQLException e) {
-			throw BaseException.serverException(e);
-		}
-	}
-
 	@Override
 	public Connection connect(String url, Properties info) throws SQLException {
 		if (!acceptsURL(url)) {
