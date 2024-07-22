@@ -48,7 +48,12 @@ public class CsvResultSet implements ResultSet {
 
 	@Override
 	public long getLong(String columnLabel) throws SQLException {
-		return Long.parseLong(data.get(0)[0]);
+		for (int i = 0; i < columns.length; i++) {
+			if (columns[i].equalsIgnoreCase(columnLabel)) {
+				return Long.parseLong(data.get(currentIndex)[i]);
+			}
+		}
+		return 0;
 	}
 
 	@Override
